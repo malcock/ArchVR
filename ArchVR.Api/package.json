@@ -1,0 +1,44 @@
+{
+  "name": "archvr.api",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsup src/index.ts --format esm --sourcemap --watch --onSuccess \"node dist/index.js --inspect --enable-source-maps\"",
+    "start": "node -v && ts-node --esm ./src/index.ts ",
+    "build": "tsup src/index.ts --format esm",
+    "blah": "tsc --build  --verbose ",
+    "prisma:init": "prisma init",
+    "prisma:reset": "dotenv -e .env.development.local -- prisma migrate reset",
+    "prisma:migrate": "dotenv -e .env.development.local -- prisma migrate dev --preview-feature",
+    "prisma:seed": "dotenv -e .env.development.local -- prisma db seed",
+    "prisma:generate": "prisma generate",
+    "prisma:deploy": "prisma migrate deploy && prisma generate && prisma db seed"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@elysiajs/swagger": "^0.7.2",
+    "@types/bcrypt": "^5.0.0",
+    "@types/node": "^18.16.0",
+    "@types/uuid": "^9.0.5",
+    "prisma": "^5.3.1",
+    "ts-node": "^10.9.1",
+    "tsup": "^7.2.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "@azure/storage-blob": "^12.16.0",
+    "@bogeychan/elysia-polyfills": "latest",
+    "@elysiajs/jwt": "^0.7.0",
+    "@prisma/client": "^5.3.1",
+    "applicationinsights": "^2.7.3",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.3.1",
+    "elysia": "^0.7.13",
+    "minimatch": "^9.0.3",
+    "nanoid": "^5.0.1",
+    "stripe": "^13.7.0",
+    "uuid": "^9.0.1"
+  }
+}
