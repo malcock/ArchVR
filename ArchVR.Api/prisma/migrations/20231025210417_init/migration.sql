@@ -21,6 +21,7 @@ CREATE TABLE [dbo].[RefreshToken] (
     [id] NVARCHAR(1000) NOT NULL,
     [hashedToken] NVARCHAR(1000) NOT NULL,
     [userId] NVARCHAR(1000) NOT NULL,
+    [organisationId] NVARCHAR(1000) NOT NULL,
     [revoked] BIT NOT NULL CONSTRAINT [RefreshToken_revoked_df] DEFAULT 0,
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [RefreshToken_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIME2 NOT NULL,
@@ -46,6 +47,7 @@ CREATE TABLE [dbo].[UserOrganisations] (
     [role] INT NOT NULL,
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [UserOrganisations_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIME2 NOT NULL,
+    [defaultAt] DATETIME2 NOT NULL CONSTRAINT [UserOrganisations_defaultAt_df] DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT [UserOrganisations_pkey] PRIMARY KEY CLUSTERED ([userId],[organisationId])
 );
 

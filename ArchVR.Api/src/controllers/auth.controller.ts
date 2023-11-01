@@ -13,12 +13,7 @@ import {
 import { JwtAuth } from "../middleware/JwtAuth";
 import { jwtPlugin } from "../jwt";
 import { hashToken } from "../utils/hashToken";
-
-export class AuthError extends Error {
-  constructor(public status: number, public message: string) {
-    super(message);
-  }
-}
+import { HttpException } from "../exceptions/HttpException";
 
 export default (app: Elysia) =>
   app.use(jwtPlugin).group("auth", { detail: { tags: ["Auth"] } }, (app) =>
@@ -33,7 +28,7 @@ export default (app: Elysia) =>
         async ({ body: { email, password }, accessJwt, refreshJwt, set }) => {
           const userExists = await userService.findUserByEmail(email);
           if (userExists) {
-            throw new AuthError(403, "User exists");
+            throw new HttpException(403, "User exists");
           }
 
           //create a new user
@@ -89,7 +84,7 @@ export default (app: Elysia) =>
           const existingUser = await userService.findUserByEmail(email);
 
           if (!existingUser) {
-            throw new AuthError(403, "Invalid credentials");
+            throw new HttpException(403, "Invalid credentials");
           }
 
           const validPassword = await bcrypt.compare(
@@ -97,11 +92,12 @@ export default (app: Elysia) =>
             existingUser.password
           );
           if (!validPassword) {
-            throw new AuthError(403, "Invalid credentials");
+            throw new HttpException(403, "Invalid credentials");
           }
-          const organisationId = existingUser.Organisations.find(
-            (x) => x.isDefault
-          )!.organisationId as string;
+          //sort orgs to make sure we get the latest one to be made default
+          const organisationId = existingUser.Organisations.sort((a, b) => {
+            return a.defaultAt.getTime() > b.defaultAt.getTime() ? -1 : 1;
+          })[0].organisationId;
           const jti = uuidv4();
           const accessToken = await accessJwt.sign({
             userId: existingUser.id,
@@ -191,7 +187,7 @@ export default (app: Elysia) =>
               }
             }
           }
-          throw new AuthError(401, "Unauthorized");
+          throw new HttpException(401, "Unauthorized");
         },
         {
           body: t.Object({
@@ -216,6 +212,23 @@ export default (app: Elysia) =>
           body: t.Object({
             refreshToken: t.String(),
           }),
+        }
+      )
+      .post(
+        "switch-org",
+        async ({ body: { organisationId }, auth: { userId } }) => {
+          await organisationService.setUserDefaultOrganisation(
+            organisationId,
+            userId
+          );
+        },
+        {
+          body: t.Object({
+            organisationId: t.String(),
+          }),
+          detail: {
+            security: [{ bearerAuth: [] }],
+          },
         }
       )
   );

@@ -7,16 +7,33 @@ import projectController from "./controllers/project.controller";
 import { jwt } from "@elysiajs/jwt";
 import { jwtPlugin } from "./jwt";
 import { JwtAuth, JwtAuthError } from "./middleware/JwtAuth";
-import authController, { AuthError } from "./controllers/auth.controller";
+import authController from "./controllers/auth.controller";
 
 import organisationController from "./controllers/organisation.controller";
 import sceneController from "./controllers/scene.controller";
+import fileController from "./controllers/file.controller";
+import { HttpException } from "./exceptions/HttpException";
+import deviceController from "./controllers/device.controller";
 
 const app = new Elysia()
 
-  .onError(({ code, error }) => {
-    console.log({ error }, { code }, error.stack);
-    return new Response(error.message);
+  .error({
+    JWT_AUTH_ERROR: JwtAuthError,
+
+    HTTP_EXCEPTION: HttpException,
+  })
+  .onError(({ code, error, set }) => {
+    console.log("!!!!ERROR!!!!");
+    console.log({ error, code, stack: error.stack });
+    if (code === "JWT_AUTH_ERROR") {
+      set.status = 401;
+      return error.message;
+    }
+    if (code === "HTTP_EXCEPTION") {
+      set.status = error.status;
+      return error.message;
+    }
+    // return new Response(error.message);
   })
 
   .use(
@@ -35,25 +52,22 @@ const app = new Elysia()
               scheme: "bearer",
               bearerFormat: "JWT",
             },
+            apiKey: {
+              type: "http",
+              scheme: "bearer",
+            },
           },
         },
       },
     })
   )
-  .error({ JWT_AUTH_ERROR: JwtAuthError, AUTH_ERROR: AuthError })
-  .onError((ctx) => {
-    if (ctx.code === "JWT_AUTH_ERROR") {
-      ctx.set.status = 401;
-      return ctx.error.message;
-    }
-  })
 
   .use(organisationController)
   .use(authController)
   .use(projectController)
   .use(sceneController)
-  // .get("/", () => ({ hello: "Node.js👋" }))
-
+  .use(fileController)
+  .use(deviceController)
   .listen(8080);
 
 console.log(`Listening on http://localhost:${app.server!.port}`);

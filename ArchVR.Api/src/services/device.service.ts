@@ -73,11 +73,13 @@ class DeviceService {
 
   count(
     organisationId: string | undefined = undefined,
+    sceneId: string | undefined = undefined,
     name: string | undefined = undefined
   ) {
     return db.device.count({
       where: {
         ...(organisationId && { organisationId }),
+        ...(sceneId && { sceneId }),
         ...(name && {
           name: {
             contains: name,

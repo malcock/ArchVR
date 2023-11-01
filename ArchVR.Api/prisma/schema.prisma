@@ -51,12 +51,12 @@ model UserOrganisations {
   userId         String
   organisationId String
   role           Int //use Roq  qle enum
-  isDefault      Boolean      @default(false)
   User           User         @relation(fields: [userId], references: [id])
   Organisation   Organisation @relation(fields: [organisationId], references: [id])
   // Role           Role         @relation(fields: [roleId], references: [id])
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
+  defaultAt      DateTime     @default(now())
 
   @@id([userId, organisationId])
 }
@@ -67,6 +67,8 @@ model OrganisationFiles {
 
   File         File         @relation(fields: [fileId], references: [id])
   Organisation Organisation @relation(fields: [organisationId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 
   @@id([organisationId, fileId])
 }

@@ -5,7 +5,6 @@ import permissionService from "../services/permission.service";
 export const OrganisationPermissons =
   (permissionRequired: Permissions) =>
   async ({ auth, params, body }: any) => {
-    console.log({ auth, params, body });
     const { userId } = auth;
     const organisationId =
       auth.organisationId || params.organisationId || body.organisationId;

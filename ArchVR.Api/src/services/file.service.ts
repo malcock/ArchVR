@@ -3,10 +3,9 @@ import {
   StorageSharedKeyCredential,
 } from "@azure/storage-blob";
 
-import internal from "stream";
-import getStream from "into-stream";
 import { db } from "../utils/db";
-import { File } from "@prisma/client";
+import { File as DBFile, Prisma } from "@prisma/client";
+import { Readable } from "stream";
 
 class FileService {
   containerName = "uploads";
@@ -21,7 +20,7 @@ class FileService {
     });
   }
 
-  update(fileId: string, data: Partial<File>) {
+  update(fileId: string, data: Partial<DBFile>) {
     console.log(fileId, data);
     return db.file.update({
       where: {
@@ -31,25 +30,64 @@ class FileService {
     });
   }
 
-  upload(blobName: string, file: Express.Multer.File) {
+  grantOrgAccess(fileId: string, organisationId: string) {
+    return db.organisationFiles.create({
+      data: {
+        fileId,
+        organisationId,
+      },
+    });
+  }
+
+  removeOrgAccess(fileId: string, organisationId: string) {
+    return db.organisationFiles.delete({
+      where: {
+        organisationId_fileId: {
+          fileId,
+          organisationId,
+        },
+      },
+    });
+  }
+
+  async upload(blobName: string, file: File) {
     const blobService = new BlockBlobClient(
       process.env.AZURE_STORAGE_CONNECTION_STRING as string,
       this.containerName,
       blobName
     );
 
-    const stream = getStream(file.buffer);
-    const streamLength = file.buffer.length;
+    const stream = file.stream();
+    const streamLength = file.size;
 
-    return blobService.uploadStream(stream, streamLength, undefined, {
-      blobHTTPHeaders: {
-        blobContentType: file.mimetype,
+    const reader = stream.getReader();
+    // Convert the Web API ReadableStream to a Node.js Readable stream
+    const nodeReadableStream = new Readable({
+      async read() {
+        // Implement the _read method to push data from the Web API ReadableStream to the Node.js Readable stream
+        const chunk = await reader.read(); // Adjust the buffer size as needed
+        if (!chunk.done) {
+          this.push(chunk.value);
+        } else {
+          this.push(null); // Signal the end of the stream
+        }
       },
     });
+
+    return blobService.uploadStream(
+      nodeReadableStream,
+      streamLength,
+      undefined,
+      {
+        blobHTTPHeaders: {
+          blobContentType: file.type,
+        },
+      }
+    );
   }
 
   async getFile(id: string) {
-    return db.file.findFirstOrThrow({
+    return db.file.findFirst({
       where: {
         id,
       },
@@ -68,10 +106,57 @@ class FileService {
 
     return {
       contentType: props.contentType,
-      buffer: blobService.downloadToBuffer(),
+      buffer: await blobService.downloadToBuffer(),
     };
 
     // blobService.generateSasUrl({});
+  }
+
+  count(
+    organisationId: string | undefined = undefined,
+    name: string | undefined = undefined
+  ) {
+    return db.file.count({
+      where: {
+        ...(organisationId && {
+          Organisations: {
+            every: {
+              organisationId,
+            },
+          },
+        }),
+        ...(name && {
+          name: {
+            contains: name,
+          },
+        }),
+      },
+    });
+  }
+
+  list(
+    organisationId: string | undefined = undefined,
+    name: string | undefined = undefined,
+    take: number = 10,
+    skip: number = 0,
+    orderBy:
+      | Prisma.Enumerable<Prisma.ProjectOrderByWithRelationInput>
+      | undefined = undefined
+  ) {
+    return db.file.findMany({
+      where: {
+        ...(organisationId && {
+          Organisations: {
+            every: {
+              organisationId,
+            },
+          },
+        }),
+      },
+      take,
+      skip,
+      orderBy,
+    });
   }
 }
 

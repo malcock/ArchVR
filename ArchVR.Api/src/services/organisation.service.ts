@@ -37,19 +37,8 @@ class OrganisationService {
   }
 
   async setUserDefaultOrganisation(organisationId: string, userId: string) {
-    await db.userOrganisations.update({
-      data: {
-        isDefault: false,
-      },
-      where: {
-        userId_organisationId: {
-          organisationId,
-          userId,
-        },
-      },
-    });
     return db.userOrganisations.update({
-      data: { isDefault: true },
+      data: { defaultAt: new Date() },
       where: {
         userId_organisationId: {
           organisationId,

@@ -7,6 +7,7 @@ import { ProjectPermissions } from "../middleware/ProjectPermissions";
 import { Permissions } from "../enums/Permissions";
 import sceneService from "../services/scene.service";
 import { OrganisationPermissons } from "../middleware/OrganisationPermission";
+import { HttpException } from "../exceptions/HttpException";
 
 export default (app: Elysia) =>
   app.group(
@@ -21,7 +22,13 @@ export default (app: Elysia) =>
         )
         .post(
           "",
-          async ({ body: { name, organisationId } }) => {
+          async ({ body, auth }) => {
+            const { name } = body;
+            const organisationId = auth.organisationId || body.organisationId;
+            console.log(name, organisationId);
+            if (!name || !organisationId) {
+              throw new HttpException(400, "Missing name or organisationId");
+            }
             const proj = await projectService.create(name, organisationId);
 
             return proj;
@@ -29,7 +36,7 @@ export default (app: Elysia) =>
           {
             body: t.Object({
               name: t.String(),
-              organisationId: t.String(),
+              organisationId: t.Optional(t.String()),
             }),
             beforeHandle: [OrganisationPermissons(Permissions.CreateProjects)],
           }

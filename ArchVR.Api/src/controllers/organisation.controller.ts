@@ -202,24 +202,24 @@ export default (app: Elysia) =>
             }),
           }
         )
-        .post(
-          "/:organisationId/projects",
-          async ({
-            body: { name },
-            params: { organisationId },
-            auth: { userId },
-          }) => {
-            const proj = await projectService.create(name, organisationId);
-            await projectService.setUserRole(proj.id, userId, Roles.Owner);
-            return proj;
-          },
-          {
-            beforeHandle: [OrganisationPermissons(Permissions.CreateProjects)],
-            body: t.Object({
-              name: t.String(),
-            }),
-          }
-        )
+        // .post(
+        //   "/:organisationId/projects",
+        //   async ({
+        //     body: { name },
+        //     params: { organisationId },
+        //     auth: { userId },
+        //   }) => {
+        //     const proj = await projectService.create(name, organisationId);
+        //     await projectService.setUserRole(proj.id, userId, Roles.Owner);
+        //     return proj;
+        //   },
+        //   {
+        //     beforeHandle: [OrganisationPermissons(Permissions.CreateProjects)],
+        //     body: t.Object({
+        //       name: t.String(),
+        //     }),
+        //   }
+        // )
         .get(
           "/:organisationId/devices",
           async ({ query, params: { organisationId } }) => {
