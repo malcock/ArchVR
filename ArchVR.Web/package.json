@@ -5,14 +5,18 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vite-ssg build",
     "preview": "vite preview"
   },
   "dependencies": {
+    "dotenv": "^16.3.1",
+    "dropzone": "^6.0.0-beta.2",
+    "pinia": "^2.1.7",
     "vue": "^3.3.4"
   },
   "devDependencies": {
     "@types/dropzone": "^5.7.6",
+    "@types/node": "^20.8.10",
     "@vitejs/plugin-vue": "^4.2.3",
     "autoprefixer": "^10.4.16",
     "daisyui": "^3.9.4",
