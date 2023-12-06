@@ -14,9 +14,18 @@ import sceneController from "./controllers/scene.controller";
 import fileController from "./controllers/file.controller";
 import { HttpException } from "./exceptions/HttpException";
 import deviceController from "./controllers/device.controller";
+import { cors } from "@elysiajs/cors";
 
+global.Response = class extends Response {
+  constructor(body: any, init: any) {
+    console.log(body, init);
+    super(body === "" && init.status === 204 ? null : body, init);
+    console.log({});
+  }
+};
+const hasHeaderShorthand = "toJSON" in new Headers();
+console.log({ hasHeaderShorthand });
 const app = new Elysia()
-
   .error({
     JWT_AUTH_ERROR: JwtAuthError,
 
@@ -35,7 +44,7 @@ const app = new Elysia()
     }
     // return new Response(error.message);
   })
-
+  .use(cors())
   .use(
     swagger({
       documentation: {
@@ -68,6 +77,7 @@ const app = new Elysia()
   .use(sceneController)
   .use(fileController)
   .use(deviceController)
+
   .listen(8080);
 
 console.log(`Listening on http://localhost:${app.server!.port}`);

@@ -56,6 +56,7 @@ export const JwtAuth = (config: JwtAuthConfig) =>
 
 export const isPathExcluded = (path: string, excludedPatterns?: string[]) => {
   if (!excludedPatterns) return false;
+  console.log("excluded patterns!", excludedPatterns);
   for (const pattern of excludedPatterns) {
     if (minimatch(path, pattern)) return true;
   }

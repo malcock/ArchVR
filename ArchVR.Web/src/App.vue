@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from "./components/HelloWorld.vue";
+import LoginForm from "./components/auth/LoginForm.vue";
+console.log(process.env);
 </script>
 
 <template>
@@ -12,6 +14,7 @@ import HelloWorld from './components/HelloWorld.vue'
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" />
+  <LoginForm />
 </template>
 
 <style scoped>

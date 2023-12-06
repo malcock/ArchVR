@@ -1,0 +1,43 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "prisma:init": "prisma init",
+    "prisma:reset": "prisma migrate reset",
+    "prisma:migrate": "prisma migrate dev --preview-feature",
+    "prisma:seed": "prisma db seed",
+    "prisma:generate": "prisma generate",
+    "prisma:deploy": "prisma migrate deploy && prisma generate && prisma db seed"
+  },
+  "devDependencies": {
+    "@nuxt/devtools": "latest",
+    "@nuxtjs/eslint-config-typescript": "^12.1.0",
+    "@nuxtjs/tailwindcss": "^6.9.5",
+    "@sidebase/nuxt-auth": "^0.6.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20.9.0",
+    "eslint": "^8.53.0",
+    "nuxt": "^3.8.1",
+    "pinia": "^2.1.7",
+    "prisma": "^5.6.0",
+    "vue": "^3.3.8",
+    "vue-router": "^4.2.5"
+  },
+  "dependencies": {
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@pinia/nuxt": "^0.5.1",
+    "@trpc/client": "^10.43.3",
+    "@trpc/server": "^10.43.3",
+    "bcrypt": "^5.1.1",
+    "chalk": "^5.3.0",
+    "next-auth": "^4.21.1",
+    "trpc-nuxt": "^0.10.12",
+    "zod": "^3.22.4"
+  }
+}
