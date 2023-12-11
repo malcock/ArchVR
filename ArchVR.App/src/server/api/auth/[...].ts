@@ -5,12 +5,14 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NuxtAuthHandler } from "#auth";
 import { envConfig } from "~/envConfig";
-import { prisma } from "~/server/prisma";
+import { prisma } from "~/services/prisma";
 import { compare } from "bcrypt";
+import { checkUserCredentials } from "~/services/users.services";
 
 export default NuxtAuthHandler({
   pages: {
     signIn: "/login",
+    newUser: "/welcome",
   },
   adapter: PrismaAdapter(prisma),
   secret: envConfig.AUTH_NUXT_SECRET, // secret needed to run nuxt-auth in production mode (used to encrypt data)
@@ -49,31 +51,32 @@ export default NuxtAuthHandler({
         },
       },
       async authorize(credentials: any) {
-        const user = await prisma.user.findUnique({
-          where: { email: credentials?.email },
-        });
+        return checkUserCredentials(credentials.email, credentials.password);
+        // const user = await prisma.user.findUnique({
+        //   where: { email: credentials?.email },
+        // });
 
-        if (!user) {
-          throw createError({
-            statusCode: 403,
-            statusMessage: "Credentials not working",
-          });
-        }
+        // if (!user) {
+        //   throw createError({
+        //     statusCode: 403,
+        //     statusMessage: "Credentials not working",
+        //   });
+        // }
 
-        const isPasswordValid = await compare(
-          credentials?.password,
-          user.password as string
-        );
+        // const isPasswordValid = await compare(
+        //   credentials?.password,
+        //   user.password as string
+        // );
 
-        if (!isPasswordValid) {
-          throw createError({
-            statusCode: 403,
-            statusMessage: "Credentials not working",
-          });
-        }
-        console.log("password valid");
-        console.log({ user });
-        return user;
+        // if (!isPasswordValid) {
+        //   throw createError({
+        //     statusCode: 403,
+        //     statusMessage: "Credentials not working",
+        //   });
+        // }
+        // console.log("password valid");
+        // console.log({ user });
+        // return user;
       },
     }),
   ],

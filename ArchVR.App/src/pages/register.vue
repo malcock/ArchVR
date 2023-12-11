@@ -1,4 +1,5 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+import RegisterFormVue from "~/components/auth/RegisterForm.vue";
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
@@ -9,7 +10,7 @@ definePageMeta({
 
 <template>
   <Suspense>
-    <AuthLoginForm />
+    <RegisterFormVue />
   </Suspense>
 </template>
 

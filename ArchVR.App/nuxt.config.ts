@@ -4,11 +4,18 @@ import { envConfig } from "./src/envConfig";
 export default defineNuxtConfig({
   srcDir: "src",
   devtools: { enabled: true },
+  build: {
+    transpile: ["trpc-nuxt"],
+  },
   modules: ["@sidebase/nuxt-auth", "@nuxtjs/tailwindcss"],
   auth: {
     baseURL: envConfig.AUTH_ORIGIN,
     provider: {
       type: "authjs",
     },
+    globalAppMiddleware: {
+      isEnabled: true,
+    },
   },
+  tailwindcss: {},
 });

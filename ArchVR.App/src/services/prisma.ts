@@ -22,8 +22,6 @@ export const prisma =
             { emit: "event", level: "query" },
           ]
         : ["error"],
-  }).$on("query", (e) => {
-    prismaLogger(e);
   });
 // .$extends({
 //   query: {
