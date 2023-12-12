@@ -52,41 +52,18 @@ export default NuxtAuthHandler({
       },
       async authorize(credentials: any) {
         return checkUserCredentials(credentials.email, credentials.password);
-        // const user = await prisma.user.findUnique({
-        //   where: { email: credentials?.email },
-        // });
-
-        // if (!user) {
-        //   throw createError({
-        //     statusCode: 403,
-        //     statusMessage: "Credentials not working",
-        //   });
-        // }
-
-        // const isPasswordValid = await compare(
-        //   credentials?.password,
-        //   user.password as string
-        // );
-
-        // if (!isPasswordValid) {
-        //   throw createError({
-        //     statusCode: 403,
-        //     statusMessage: "Credentials not working",
-        //   });
-        // }
-        // console.log("password valid");
-        // console.log({ user });
-        // return user;
       },
     }),
   ],
   callbacks: {
     // Specify here the payload of your token and session
-    jwt({ token, user }) {
+    jwt({ token, user, account, trigger }) {
+      console.log(account, trigger);
       if (user) {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
+        token.blah = "poop";
       }
       return token;
     },
@@ -94,6 +71,7 @@ export default NuxtAuthHandler({
       session.user.id = token.id;
       session.user.name = token.name;
       session.user.email = token.email;
+      session.user.boo = "peep";
       return session;
     },
   },

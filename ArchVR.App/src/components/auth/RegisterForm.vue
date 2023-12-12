@@ -32,7 +32,8 @@ const registerUser = async () => {
     method: "POST",
     body: credentialsModel,
   }).then(async (res) => {
-    if (res.error) {
+    console.log(res);
+    if (res.error.value) {
       //TODO: Do something!
       return;
     }

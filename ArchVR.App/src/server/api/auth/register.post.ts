@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   }
   console.log(body.email);
 
-  userService.createUserByEmailAndPassword(body);
+  await userService.createUserByEmailAndPassword(body);
 
   setResponseStatus(event, 201);
 

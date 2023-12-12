@@ -1,6 +1,6 @@
 // import { z } from "zod";
 import { TRPCError } from "@trpc/server";
-import { protectedProcedure, router } from "../trpc";
+import { protectedProcedure, router, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { updateUser } from "~/services/users.services";
 
@@ -32,7 +32,9 @@ export const userRouter = router({
         id: z.string(),
       })
     )
-    .mutation(({ input }) => {
-      updateUser(input);
+    .mutation(async ({ input }) => {
+      console.log("trpc");
+      const u = await updateUser(input);
+      return u;
     }),
 });

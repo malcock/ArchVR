@@ -1,16 +1,21 @@
 <script lang="ts" setup>
-const { data, status } = useAuth();
+const { data, status, getSession } = useAuth();
 
 const { $client } = useNuxtApp();
 
 const user = reactive({
+  id: (data.value?.user! as any).id,
   email: data.value?.user?.email,
   image: data.value?.user?.image,
   name: data.value?.user?.name,
 });
 
 const updateUser = async () => {
-  // $client.user.updateUser.mutate({});
+  await $client.user.updateUser.mutate({
+    id: user.id as string,
+    email: user.email as string,
+    name: user.name as string,
+  });
 };
 </script>
 
@@ -20,7 +25,6 @@ const updateUser = async () => {
       Name
       <input
         class="input"
-        type="email"
         v-model="user.name"
         id="email"
         name="email"

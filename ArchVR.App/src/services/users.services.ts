@@ -50,6 +50,7 @@ async function checkUserCredentials(email: string, password: string) {
 }
 
 function updateUser(user: Partial<User>) {
+  console.log("db...");
   return prisma.user.update({
     where: {
       id: user.id,

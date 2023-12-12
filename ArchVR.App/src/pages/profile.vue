@@ -3,7 +3,9 @@
 <template>
   <div>
     Profile page
-    <AuthProfileForm />
+    <Suspense>
+      <AuthProfileForm />
+    </Suspense>
   </div>
 </template>
 
