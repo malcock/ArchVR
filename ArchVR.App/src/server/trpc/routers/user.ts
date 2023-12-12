@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { protectedProcedure, router, publicProcedure } from "../trpc";
 import { z } from "zod";
 import { updateUser } from "~/services/users.services";
+import chalk from "chalk";
 
 export const userRouter = router({
   getUsers: protectedProcedure.query(async (req) => {
@@ -33,7 +34,7 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      console.log("trpc");
+      console.log(chalk.red("TRPC updating user"));
       const u = await updateUser(input);
       return u;
     }),

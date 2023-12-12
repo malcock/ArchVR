@@ -1,8 +1,10 @@
 <script lang="ts" setup>
+import chalk from "chalk";
+import useTprc from "~/composables/useTrpc";
 const { data, status, getSession } = useAuth();
 
-const { $client } = useNuxtApp();
-
+const tprc = useTprc();
+const sesh = ref<any>(null);
 const user = reactive({
   id: (data.value?.user! as any).id,
   email: data.value?.user?.email,
@@ -11,11 +13,12 @@ const user = reactive({
 });
 
 const updateUser = async () => {
-  await $client.user.updateUser.mutate({
+  await tprc().user.updateUser.mutate({
     id: user.id as string,
     email: user.email as string,
     name: user.name as string,
   });
+  sesh.value = await getSession();
 };
 </script>
 

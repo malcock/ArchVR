@@ -57,8 +57,8 @@ export default NuxtAuthHandler({
   ],
   callbacks: {
     // Specify here the payload of your token and session
-    jwt({ token, user, account, trigger }) {
-      console.log(account, trigger);
+    jwt({ token, user, account, trigger, profile, session }) {
+      console.log("token", { token, user, account, trigger, profile, session });
       if (user) {
         token.id = user.id;
         token.name = user.name;
@@ -67,11 +67,14 @@ export default NuxtAuthHandler({
       }
       return token;
     },
-    session({ session, token }: { session: any; token: any }) {
-      session.user.id = token.id;
-      session.user.name = token.name;
-      session.user.email = token.email;
-      session.user.boo = "peep";
+    session({ session, token, newSession, trigger, user }) {
+      console.log("sesh", { session, token, newSession, trigger, user });
+      if (session.user) {
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.boo = "peep";
+      }
       return session;
     },
   },
