@@ -7,6 +7,12 @@ function findUserByEmail(email: string) {
     where: {
       email,
     },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
+    },
   });
 }
 
@@ -14,6 +20,12 @@ function findUserById(id: string) {
   return prisma.user.findUnique({
     where: {
       id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      image: true,
     },
   });
 }

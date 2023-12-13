@@ -8,7 +8,7 @@ import AuthMenuVue from "./AuthMenu.vue";
       <NuxtLink to="/" class="text-red-700 font-bold">Home</NuxtLink>
       <ul class="menu flex ml-auto space-x-4">
         <li><NuxtLink to="/profile"> Profile page</NuxtLink></li>
-        <li>Another page</li>
+        <li><NuxtLink to="/protected">Another page</NuxtLink></li>
         <li>One more</li>
       </ul>
       <AuthMenuVue />

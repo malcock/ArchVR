@@ -7,7 +7,11 @@ import { NuxtAuthHandler } from "#auth";
 import { envConfig } from "~/envConfig";
 import { prisma } from "~/services/prisma";
 import { compare } from "bcrypt";
-import { checkUserCredentials } from "~/services/users.services";
+import {
+  checkUserCredentials,
+  findUserByEmail,
+  findUserById,
+} from "~/services/users.services";
 
 export default NuxtAuthHandler({
   pages: {
@@ -57,25 +61,23 @@ export default NuxtAuthHandler({
   ],
   callbacks: {
     // Specify here the payload of your token and session
-    jwt({ token, user, account, trigger, profile, session }) {
-      console.log("token", { token, user, account, trigger, profile, session });
-      if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.blah = "poop";
+    jwt: async ({ token, trigger, user }) => {
+      if (trigger === "signIn") {
+        token.user = user || (await findUserByEmail(token.email as string));
+      } else {
+        token.user = await findUserById((token.user as any).id);
       }
-      return token;
+      if (!token.user) {
+        return Promise.reject(token);
+      }
+
+      return Promise.resolve(token);
     },
-    session({ session, token, newSession, trigger, user }) {
-      console.log("sesh", { session, token, newSession, trigger, user });
-      if (session.user) {
-        session.user.id = token.id;
-        session.user.name = token.name;
-        session.user.email = token.email;
-        session.user.boo = "peep";
-      }
-      return session;
+    session: async ({ session, token }) => {
+      //@ts-ignore
+      session.user = token.user;
+      console.log(session);
+      return Promise.resolve(session);
     },
   },
   session: { strategy: "jwt" },

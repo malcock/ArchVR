@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import chalk from "chalk";
 import useTprc from "~/composables/useTrpc";
-const { data, status, getSession } = useAuth();
+const { data, status, getSession, signIn } = useAuth();
 
 const tprc = useTprc();
-const sesh = ref<any>(null);
+
 const user = reactive({
   id: (data.value?.user! as any).id,
   email: data.value?.user?.email,
@@ -18,7 +18,8 @@ const updateUser = async () => {
     email: user.email as string,
     name: user.name as string,
   });
-  sesh.value = await getSession();
+  //force update session to get new details
+  await getSession({ force: true });
 };
 </script>
 
