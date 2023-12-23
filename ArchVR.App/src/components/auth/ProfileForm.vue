@@ -24,7 +24,25 @@ const updateUser = async () => {
 </script>
 
 <template>
-  <form @submit.prevent="updateUser" class="space-y-4">
+  <Card>
+    <template #title>Profile</template>
+    <template #content>
+      <form @submit.prevent="updateUser" class="space-y-4">
+        <div class="flex flex-col gap-2">
+          <label for="name">Name</label>
+          <InputText
+            id="name"
+            v-model="user.name"
+            aria-describedby="name-help"
+          />
+          <small id="name-help">What would you like to be known as</small>
+        </div>
+
+        <Button>Update</Button>
+      </form>
+    </template>
+  </Card>
+  <!-- <form @submit.prevent="updateUser" class="space-y-4">
     <label class="field">
       Name
       <input
@@ -50,7 +68,7 @@ const updateUser = async () => {
     </label>
 
     <button type="submit" class="btn btn-primary">Update</button>
-  </form>
+  </form> -->
 </template>
 
 <style lang="scss"></style>

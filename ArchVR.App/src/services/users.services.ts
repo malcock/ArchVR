@@ -12,6 +12,11 @@ function findUserByEmail(email: string) {
       name: true,
       email: true,
       image: true,
+      accounts: {
+        select: {
+          provider: true,
+        },
+      },
     },
   });
 }
@@ -26,39 +31,13 @@ function findUserById(id: string) {
       name: true,
       email: true,
       image: true,
+      accounts: {
+        select: {
+          provider: true,
+        },
+      },
     },
   });
-}
-
-function createUserByEmailAndPassword(user: {
-  email: string;
-  password: string;
-}) {
-  user.password = bcrypt.hashSync(user.password, 12);
-  return prisma.user.create({
-    data: user,
-  });
-}
-
-async function checkUserCredentials(email: string, password: string) {
-  const user = await prisma.user.findUnique({
-    where: {
-      email,
-    },
-  });
-  if (!user)
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Credentials not working",
-    });
-  const isPasswordValid = await compare(password, user.password as string);
-  if (!isPasswordValid) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: "Credentials not working",
-    });
-  }
-  return user;
 }
 
 function updateUser(user: Partial<User>) {
@@ -70,10 +49,4 @@ function updateUser(user: Partial<User>) {
   });
 }
 
-export {
-  checkUserCredentials,
-  createUserByEmailAndPassword,
-  findUserByEmail,
-  findUserById,
-  updateUser,
-};
+export { findUserByEmail, findUserById, updateUser };

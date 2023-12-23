@@ -24,6 +24,7 @@
     "@types/node": "^20.9.0",
     "eslint": "^8.53.0",
     "nuxt": "^3.8.1",
+    "nuxt-primevue": "^0.2.2",
     "pinia": "^2.1.7",
     "prisma": "^5.6.0",
     "vue": "^3.3.8",
@@ -32,13 +33,17 @@
   "dependencies": {
     "@next-auth/prisma-adapter": "^1.0.7",
     "@pinia/nuxt": "^0.5.1",
+    "@sendgrid/mail": "^8.1.0",
     "@trpc/client": "^10.43.3",
     "@trpc/server": "^10.43.3",
+    "@vee-validate/zod": "^4.12.3",
     "bcrypt": "^5.1.1",
     "chalk": "^5.3.0",
     "next-auth": "^4.21.1",
+    "primevue": "^3.44.0",
     "superjson": "^2.2.1",
     "trpc-nuxt": "^0.10.12",
+    "vee-validate": "^4.12.3",
     "zod": "^3.22.4"
   }
 }

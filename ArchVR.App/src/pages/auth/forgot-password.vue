@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 definePageMeta({
   auth: {
     unauthenticatedOnly: true,
@@ -8,9 +8,11 @@ definePageMeta({
 </script>
 
 <template>
-  <Suspense>
-    <AuthLoginForm />
-  </Suspense>
+  <div class="my-8">
+    <Suspense>
+      <AuthForgottenPasswordForm />
+    </Suspense>
+  </div>
 </template>
 
 <style></style>

@@ -13,7 +13,6 @@ const credentialsSignIn = async () => {
     password: credentialsModel.password,
     callbackUrl: "/",
   });
-  console.log(e);
 };
 
 const providers = await getProviders().then((p) => {
@@ -27,9 +26,69 @@ const providers = await getProviders().then((p) => {
 </script>
 
 <template>
-  <div class="base-200 rounded-md flex flex-col p-4 w-96 mx-auto">
+  <Card class="max-w-lg mx-auto">
+    <template #title> Login </template>
+    <template #content>
+      <form @submit.prevent="credentialsSignIn" class="space-y-8">
+        <div class="flex flex-col gap-2">
+          <label for="email">Email</label>
+          <InputText
+            id="email"
+            v-model="credentialsModel.email"
+            aria-describedby="email-help"
+          />
+          <small id="email-help">Your email address</small>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label for="email">Password</label>
+          <InputText
+            id="password"
+            v-model="credentialsModel.password"
+            type="password"
+            aria-describedby="password-help"
+          />
+          <small id="password-help" class="flex justify-between"
+            ><span>Your super secret password</span>
+            <NuxtLink
+              to="/auth/forgot-password"
+              tabindex="-1"
+              class="text-right"
+              >Forgotten password?</NuxtLink
+            ></small
+          >
+        </div>
+        <div class="flex justify-between">
+          <Button
+            @click="$router.push('/auth/register')"
+            text
+            type="button"
+            tabindex="-1"
+            to="/auth/register"
+            >Register</Button
+          >
+          <Button type="submit">Login</Button>
+        </div>
+      </form>
+
+      <template v-if="providers.oauthProviders">
+        <Divider>OR</Divider>
+        <div class="auth-providers">
+          <Button
+            plain
+            class="btn w-full"
+            v-for="provider in providers.oauthProviders"
+            type="button"
+            @click="signIn(provider!.id)"
+          >
+            Sign in with {{ provider?.name }}
+          </Button>
+        </div>
+      </template>
+    </template>
+  </Card>
+  <!-- <div class="base-200 rounded-md flex flex-col p-4 w-96 mx-auto relative">
+    <h3 class="text-2xl mb-4">Login</h3>
     <form @submit.prevent="credentialsSignIn">
-      <h3 class="text-2xl mb-4">Login</h3>
       <label class="mb-4 field">
         Email
         <input
@@ -54,9 +113,12 @@ const providers = await getProviders().then((p) => {
           required
           aria-required="true"
         />
+        <NuxtLink to="/auth/forgot-password" tabindex="-1" class="text-right"
+          >Forgotten password?</NuxtLink
+        >
       </label>
       <div class="flex w-full justify-between">
-        <NuxtLink to="/register" class="btn">Register</NuxtLink>
+        <NuxtLink to="/auth/register" class="btn">Register</NuxtLink>
         <button type="submit" class="btn btn-primary">Login</button>
       </div>
     </form>
@@ -73,7 +135,7 @@ const providers = await getProviders().then((p) => {
         </button>
       </div>
     </template>
-  </div>
+  </div> -->
 </template>
 
 <style></style>

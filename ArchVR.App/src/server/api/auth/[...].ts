@@ -6,17 +6,15 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { NuxtAuthHandler } from "#auth";
 import { envConfig } from "~/envConfig";
 import { prisma } from "~/services/prisma";
-import { compare } from "bcrypt";
-import {
-  checkUserCredentials,
-  findUserByEmail,
-  findUserById,
-} from "~/services/users.services";
+
+import { findUserByEmail, findUserById } from "~/services/users.services";
+
+import { checkUserCredentials } from "~/services/auth.services";
 
 export default NuxtAuthHandler({
   pages: {
-    signIn: "/login",
-    newUser: "/welcome",
+    signIn: "/auth/login",
+    newUser: "/auth/welcome",
   },
   adapter: PrismaAdapter(prisma),
   secret: envConfig.AUTH_NUXT_SECRET, // secret needed to run nuxt-auth in production mode (used to encrypt data)
@@ -61,7 +59,8 @@ export default NuxtAuthHandler({
   ],
   callbacks: {
     // Specify here the payload of your token and session
-    jwt: async ({ token, trigger, user }) => {
+    jwt: async ({ token, trigger, user, profile, account, session }) => {
+      // console.log({ token, trigger, user, profile, account, session });
       if (trigger === "signIn") {
         token.user = user || (await findUserByEmail(token.email as string));
       } else {
@@ -76,7 +75,7 @@ export default NuxtAuthHandler({
     session: async ({ session, token }) => {
       //@ts-ignore
       session.user = token.user;
-      console.log(session);
+      // console.log(session);
       return Promise.resolve(session);
     },
   },

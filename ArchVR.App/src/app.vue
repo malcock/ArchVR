@@ -1,6 +1,6 @@
 <script setup>
 useHead({
-  bodyAttrs: { class: "base-100" },
+  bodyAttrs: { class: "bg-gray-50 dark:bg-gray-950" },
 });
 </script>
 <template>

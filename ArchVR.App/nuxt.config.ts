@@ -1,3 +1,4 @@
+import path from "path";
 import { envConfig } from "./src/envConfig";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -7,7 +8,7 @@ export default defineNuxtConfig({
   build: {
     transpile: ["trpc-nuxt"],
   },
-  modules: ["@sidebase/nuxt-auth", "@nuxtjs/tailwindcss"],
+  modules: ["@sidebase/nuxt-auth", "@nuxtjs/tailwindcss", "nuxt-primevue"],
   auth: {
     baseURL: envConfig.AUTH_ORIGIN,
     provider: {
@@ -18,4 +19,11 @@ export default defineNuxtConfig({
     },
   },
   tailwindcss: {},
+  primevue: {
+    options: {
+      unstyled: true,
+    },
+    importPT: { from: "primevue/passthrough/tailwind", as: "Tailwind" },
+    cssLayerOrder: "tailwind-base, primevue, tailwind-utilities",
+  },
 });

@@ -9,9 +9,11 @@ definePageMeta({
 </script>
 
 <template>
-  <Suspense>
-    <RegisterFormVue />
-  </Suspense>
+  <div class="my-8">
+    <Suspense>
+      <RegisterFormVue />
+    </Suspense>
+  </div>
 </template>
 
 <style></style>
