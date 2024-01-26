@@ -17,6 +17,29 @@ function findUserByEmail(email: string) {
           provider: true,
         },
       },
+      userOrganisations: {
+        select: {
+          defaultAt: true,
+          role: true,
+          organisationId: true,
+          organisation: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+        },
+        orderBy: [
+          {
+            defaultAt: "asc",
+          },
+          {
+            organisation: {
+              name: "asc",
+            },
+          },
+        ],
+      },
     },
   });
 }
@@ -35,6 +58,29 @@ function findUserById(id: string) {
         select: {
           provider: true,
         },
+      },
+      userOrganisations: {
+        select: {
+          defaultAt: true,
+          role: true,
+          organisationId: true,
+          organisation: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+        },
+        orderBy: [
+          {
+            defaultAt: "asc",
+          },
+          {
+            organisation: {
+              name: "asc",
+            },
+          },
+        ],
       },
     },
   });

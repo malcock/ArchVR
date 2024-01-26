@@ -44,6 +44,8 @@ model User {
   accounts           Account[]
   sessions           Session[]
   passwordResetToken PasswordResetToken[]
+  userOrganisations  UserOrganisations[]
+  projectRoles       ProjectRoles[]
 }
 
 model PasswordResetToken {
@@ -63,7 +65,53 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Product {
-  id   String @id @default(cuid())
-  name String
+model Organisation {
+  id         String              @id @unique @default(uuid())
+  name       String
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  customerId String?
+  members    UserOrganisations[]
+  Projects   Project[]
+  // Files      OrganisationFiles[]
+  // Devices    Device[]
+}
+
+model UserOrganisations {
+  userId         String
+  organisationId String
+  role           Int //use Roq  qle enum
+  user           User         @relation(fields: [userId], references: [id])
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  // Role           Role         @relation(fields: [roleId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  defaultAt      DateTime     @default(now())
+
+  @@id([userId, organisationId])
+}
+
+model Project {
+  id             String         @id @unique @default(uuid())
+  name           String         @default("Unnamed Project")
+  organisationId String
+  organisation   Organisation   @relation(fields: [organisationId], references: [id])
+  // Scenes         Scene[]
+  projectRoles   ProjectRoles[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model ProjectRoles {
+  userId    String
+  projectId String
+  role      Int //use Role enum
+  user      User    @relation(fields: [userId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id])
+  // Role      Role    @relation(fields: [roleId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@id([userId, projectId])
 }

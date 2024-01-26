@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import chalk from "chalk";
-import useTprc from "~/composables/useTrpc";
+import useTrpc from "~/composables/useTrpc";
 const { data, status, getSession, signIn } = useAuth();
 
-const tprc = useTprc();
+const trpc = useTrpc();
 
 const user = reactive({
   id: (data.value?.user! as any).id,
@@ -13,7 +12,7 @@ const user = reactive({
 });
 
 const updateUser = async () => {
-  await tprc().user.updateUser.mutate({
+  await trpc().user.updateUser.mutate({
     id: user.id as string,
     email: user.email as string,
     name: user.name as string,
@@ -24,51 +23,31 @@ const updateUser = async () => {
 </script>
 
 <template>
-  <Card>
-    <template #title>Profile</template>
+  <Card title="Profile">
     <template #content>
       <form @submit.prevent="updateUser" class="space-y-4">
-        <div class="flex flex-col gap-2">
-          <label for="name">Name</label>
-          <InputText
-            id="name"
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">Name</span>
+            <!-- <span class="label-text-alt">Top Right label</span> -->
+          </div>
+          <input
+            class="input input-bordered"
+            id="email"
             v-model="user.name"
             aria-describedby="name-help"
           />
-          <small id="name-help">What would you like to be known as</small>
-        </div>
+          <div class="label">
+            <span class="label-text-alt" id="name-help"
+              >What would you like to be known as</span
+            >
+          </div>
+        </label>
 
-        <Button>Update</Button>
+        <button class="btn btn-primary">Update</button>
       </form>
     </template>
   </Card>
-  <!-- <form @submit.prevent="updateUser" class="space-y-4">
-    <label class="field">
-      Name
-      <input
-        class="input"
-        v-model="user.name"
-        id="email"
-        name="email"
-        required
-        aria-required="true"
-      />
-    </label>
-    <label class="field">
-      Email
-      <input
-        class="input"
-        type="email"
-        v-model="user.email"
-        id="email"
-        name="email"
-        required
-        aria-required="true"
-      />
-    </label>
-
-    <button type="submit" class="btn btn-primary">Update</button>
-  </form> -->
 </template>
 
 <style lang="scss"></style>

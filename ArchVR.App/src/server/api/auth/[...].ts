@@ -9,7 +9,10 @@ import { prisma } from "~/services/prisma";
 
 import { findUserByEmail, findUserById } from "~/services/users.services";
 
-import { checkUserCredentials } from "~/services/auth.services";
+import { checkUserCredentials, getUserSession } from "~/services/auth.services";
+import organisationService from "~/services/organisation.service";
+("~/services/organisation.service");
+import { Roles } from "~/enums/Roles";
 
 export default NuxtAuthHandler({
   pages: {
@@ -60,11 +63,20 @@ export default NuxtAuthHandler({
   callbacks: {
     // Specify here the payload of your token and session
     jwt: async ({ token, trigger, user, profile, account, session }) => {
-      // console.log({ token, trigger, user, profile, account, session });
+      // console.log({ token, t rigger, user, profile, account, session });
+      console.log("jwt", { user });
       if (trigger === "signIn") {
-        token.user = user || (await findUserByEmail(token.email as string));
+        token.user =
+          user || (await getUserSession({ email: token.email as string }));
+      } else if (trigger === "signUp") {
+        token.user = user;
+        const org = await organisationService.create(user.email as string);
+        await organisationService.setUserRole(org.id, user.id, Roles.Owner);
+        await organisationService.setUserDefaultOrganisation(org.id, user.id);
+        console.log("jwt signup", { user });
+        token.user = await getUserSession({ id: user.id });
       } else {
-        token.user = await findUserById((token.user as any).id);
+        token.user = await getUserSession({ id: (token.user as any).id });
       }
       if (!token.user) {
         return Promise.reject(token);
@@ -75,7 +87,7 @@ export default NuxtAuthHandler({
     session: async ({ session, token }) => {
       //@ts-ignore
       session.user = token.user;
-      // console.log(session);
+      // console.log({ session, token });
       return Promise.resolve(session);
     },
   },

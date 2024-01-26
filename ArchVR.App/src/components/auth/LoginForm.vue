@@ -26,62 +26,76 @@ const providers = await getProviders().then((p) => {
 </script>
 
 <template>
-  <Card class="max-w-lg mx-auto">
-    <template #title> Login </template>
+  <Card class="max-w-lg mx-auto" title="Login">
     <template #content>
       <form @submit.prevent="credentialsSignIn" class="space-y-8">
-        <div class="flex flex-col gap-2">
-          <label for="email">Email</label>
-          <InputText
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">Email</span>
+            <!-- <span class="label-text-alt">Top Right label</span> -->
+          </div>
+          <input
+            class="input input-bordered"
             id="email"
             v-model="credentialsModel.email"
             aria-describedby="email-help"
           />
-          <small id="email-help">Your email address</small>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="email">Password</label>
-          <InputText
+          <div class="label">
+            <span class="label-text-alt" id="email-help"
+              >The email you signed up with</span
+            >
+          </div>
+        </label>
+
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">Password</span>
+            <!-- <span class="label-text-alt">Top Right label</span> -->
+          </div>
+          <input
+            class="input input-bordered"
             id="password"
             v-model="credentialsModel.password"
             type="password"
             aria-describedby="password-help"
           />
-          <small id="password-help" class="flex justify-between"
-            ><span>Your super secret password</span>
-            <NuxtLink
-              to="/auth/forgot-password"
-              tabindex="-1"
-              class="text-right"
-              >Forgotten password?</NuxtLink
-            ></small
-          >
-        </div>
+          <div class="label">
+            <span class="label-text-alt" id="password-help"
+              >Your super secret password</span
+            >
+            <span class="label-text-alt"
+              ><NuxtLink to="/auth/forgot-password" tabindex="-1" class="link"
+                >Forgotten password?</NuxtLink
+              ></span
+            >
+          </div>
+        </label>
+
         <div class="flex justify-between">
-          <Button
+          <button
             @click="$router.push('/auth/register')"
-            text
+            class="btn btn-link"
             type="button"
             tabindex="-1"
             to="/auth/register"
-            >Register</Button
           >
-          <Button type="submit">Login</Button>
+            Register
+          </button>
+          <button class="btn btn-primary" type="submit">Login</button>
         </div>
       </form>
 
       <template v-if="providers.oauthProviders">
-        <Divider>OR</Divider>
+        <div class="divider">OR</div>
         <div class="auth-providers">
-          <Button
-            plain
-            class="btn w-full"
+          <button
+            class="btn btn-neutral w-full"
             v-for="provider in providers.oauthProviders"
             type="button"
             @click="signIn(provider!.id)"
           >
             Sign in with {{ provider?.name }}
-          </Button>
+          </button>
         </div>
       </template>
     </template>

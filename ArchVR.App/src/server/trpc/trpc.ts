@@ -10,6 +10,10 @@ import superjson from "superjson";
  */
 import { TRPCError, initTRPC } from "@trpc/server";
 import { Context } from "~/server/trpc/context";
+import { UserSession } from "~/services/auth.services";
+import permissionService from "~/services/permission.service";
+import { Roles } from "~/enums/Roles";
+import { Permissions } from "~/enums/Permissions";
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
@@ -22,14 +26,71 @@ const authMiddleware = t.middleware(({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+  console.log(ctx.session);
   return next({
     ctx: {
-      session: { ...ctx.session, user: ctx.session.user },
+      session: { ...ctx.session, user: ctx.session.user as UserSession },
     },
   });
 });
 
+const organisationPermissionsMiddleware = (permissionRequired: Permissions) =>
+  authMiddleware.unstable_pipe(async ({ ctx, next }) => {
+    const { user } = ctx.session;
+    console.log("org perm middle", Permissions[permissionRequired], { user });
+    const hasPermssion = permissionService.organisationPermission(
+      user.id,
+      user.organisationId,
+      permissionRequired
+    );
+    if (!hasPermssion) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message:
+          "You do not have permission to perform that action on this organisation",
+      });
+    }
+    return next({
+      ctx: {
+        session: { ...ctx.session, user: ctx.session.user as UserSession },
+      },
+    });
+  });
+
+const projectPermissionsMiddleware = (permissionRequired: Permissions) =>
+  authMiddleware.unstable_pipe(({ ctx, input, next }) => {
+    const { user } = ctx.session;
+    const { projectId } = input as any;
+    if (!projectId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "'projectId' missing from input",
+      });
+    }
+    const hasPermssion = permissionService.projectPermission(
+      user.id,
+      projectId,
+      permissionRequired
+    );
+    if (!hasPermssion) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message:
+          "You do not have permission to perform that action on this project",
+      });
+    }
+    return next({
+      ctx: {
+        session: { ...ctx.session, user: ctx.session.user as UserSession },
+      },
+    });
+  });
+
 export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(authMiddleware);
+export const hasOrganisationPermission = (permissionRequired: Permissions) =>
+  t.procedure.use(organisationPermissionsMiddleware(permissionRequired));
+export const hasProjectPermission = (permissionRequired: Permissions) =>
+  t.procedure.use(projectPermissionsMiddleware(permissionRequired));
 export const router = t.router;
 export const middleware = t.middleware;

@@ -1,6 +1,7 @@
 import { compare, hashSync } from "bcrypt";
 import { prisma } from "./prisma";
 import { randomUUID } from "crypto";
+import { findUserByEmail, findUserById } from "./users.services";
 
 const saltiness = 12;
 
@@ -77,6 +78,34 @@ async function checkUserCredentials(email: string, password: string) {
   return user;
 }
 
+async function getUserSession(searchParams: { email?: string; id?: string }) {
+  const { email, id } = searchParams;
+  let user: Awaited<ReturnType<typeof findUserByEmail>>;
+  if (id) {
+    user = await findUserById(id);
+  } else if (email) {
+    user = await findUserByEmail(email);
+  } else {
+    throw createError({
+      statusCode: 400,
+      message: "session must search for an id or email",
+    });
+  }
+  if (user) {
+    const { userOrganisations, ...others } = user;
+    if (userOrganisations.length > 0) {
+      const session = {
+        ...others,
+        organisationId: userOrganisations[0].organisationId,
+      };
+      return session;
+    }
+  }
+  throw createError({ statusCode: 403, message: "user not found" });
+}
+
+export type UserSession = Awaited<ReturnType<typeof getUserSession>>;
+
 export {
   checkUserCredentials,
   createUserByEmailAndPassword,
@@ -84,4 +113,5 @@ export {
   updatePassword,
   validatePasswordResetToken,
   usePasswordResetToken,
+  getUserSession,
 };

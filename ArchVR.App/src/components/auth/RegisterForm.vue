@@ -50,55 +50,68 @@ const registerUser = async () => {
 </script>
 
 <template>
-  <Card class="max-w-lg mx-auto">
-    <template #title>Register</template>
+  <Card class="max-w-lg mx-auto" title="Register">
     <template #content>
       <form @submit.prevent="registerUser" class="space-y-8">
-        <div class="flex flex-col gap-2">
-          <label for="email">Email</label>
-          <InputText
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">Email</span>
+            <!-- <span class="label-text-alt">Top Right label</span> -->
+          </div>
+          <input
+            class="input input-bordered"
             id="email"
             v-model="credentialsModel.email"
             aria-describedby="email-help"
           />
-          <small id="email-help">Your email address</small>
-        </div>
-        <div class="flex flex-col gap-2">
-          <label for="email">Password</label>
-          <InputText
+          <div class="label">
+            <span class="label-text-alt" id="email-help"
+              >Your favourite email</span
+            >
+          </div>
+        </label>
+        <label class="form-control">
+          <div class="label">
+            <span class="label-text">Password</span>
+            <!-- <span class="label-text-alt">Top Right label</span> -->
+          </div>
+          <input
+            class="input input-bordered"
             id="password"
             v-model="credentialsModel.password"
             type="password"
             aria-describedby="password-help"
           />
-          <small id="password-help" class="flex justify-between"
-            ><span>Your super secret password</span>
-          </small>
-        </div>
+          <div class="label">
+            <span class="label-text-alt" id="password-help"
+              >Your super secret password</span
+            >
+          </div>
+        </label>
         <div class="flex justify-between">
-          <Button
+          <button
             @click="$router.push('/auth/login')"
-            text
+            class="btn btn-link"
             type="button"
             tabindex="-1"
             to="/auth/register"
-            >Login</Button
           >
-          <Button type="submit">Register</Button>
+            Login
+          </button>
+          <button class="btn btn-primary" type="submit">Register</button>
         </div>
       </form>
       <template v-if="providers.oauthProviders">
-        <Divider>OR</Divider>
+        <div class="divider">OR</div>
         <div class="auth-providers">
-          <Button
-            plain
-            class="btn w-full"
+          <button
+            class="btn btn-neutral w-full"
             v-for="provider in providers.oauthProviders"
             type="button"
             @click="signIn(provider!.id)"
           >
             Sign in with {{ provider?.name }}
-          </Button>
+          </button>
         </div>
       </template>
     </template>
