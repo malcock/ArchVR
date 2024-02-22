@@ -39,12 +39,17 @@ const cellValue = (
 <template>
   <table class="table">
     <thead>
-      <th v-for="heading in headings">
-        <span>{{ heading.label }}</span>
-        <button v-if="heading.sortable" class="btn btn-xs btn-square btn-ghost">
-          <icon class="!text-sm">swap_vert</icon>
-        </button>
-      </th>
+      <tr>
+        <th v-for="heading in headings" :key="heading.key">
+          <span>{{ heading.label }}</span>
+          <button
+            v-if="heading.sortable"
+            class="btn btn-xs btn-square btn-ghost"
+          >
+            <icon class="!text-sm">swap_vert</icon>
+          </button>
+        </th>
+      </tr>
     </thead>
     <tbody>
       <tr v-for="(row, index) in items">

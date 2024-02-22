@@ -9,6 +9,11 @@ const authItems = ref([
     url: "/app",
     children: [],
   },
+  {
+    label: "Files",
+    url: "/app/files",
+    children: [],
+  },
 ]);
 
 const unAuthedItems = ref([]);
@@ -84,7 +89,7 @@ const items = computed(() =>
           </li>
         </ul>
       </div>
-      <a class="btn btn-ghost text-xl">TDVP</a>
+      <a class="btn btn-ghost text-xl" href="/">TDVP</a>
     </div>
     <div class="navbar-center hidden lg:flex">
       <ul class="menu menu-horizontal px-1">
@@ -102,24 +107,6 @@ const items = computed(() =>
       <SiteAuthMenu />
     </div>
   </header>
-  <!-- <Menubar :model="items" class="w-full justify-between">
-    <template #item="{ item, props, hasSubmenu, root }"> 
-    <template #end>
-      <AuthMenuVue />
-    </template>
-  </Menubar> -->
-
-  <!-- <header class="base-200 border-b-red-700 border-b mb-8">
-    <div class="container flex py-4 mx-auto">
-      <NuxtLink to="/" class="text-red-700 font-bold">Home</NuxtLink>
-      <ul class="menu flex ml-auto space-x-4">
-        <li><NuxtLink to="/auth/profile"> Profile page</NuxtLink></li>
-        <li><NuxtLink to="/protected">Another page</NuxtLink></li>
-        <li>One more</li>
-      </ul>
-      <AuthMenuVue />
-    </div>
-  </header> -->
 </template>
 
 <style></style>

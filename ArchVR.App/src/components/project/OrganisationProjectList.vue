@@ -44,11 +44,18 @@ onMounted(() => {
     </template>
     <template #content
       ><CoreTable :items="projects" :fields="fields">
-        <template #cell(name)="data"> {{ data.value }}</template>
+        <template #cell(name)="data">
+          <NuxtLink :to="`/app/project/${data.item.id}`">{{
+            data.value
+          }}</NuxtLink>
+        </template>
+        <template #cell(createdAt)="data">
+          {{ new Date(data.value as string).toLocaleString() }}</template
+        >
       </CoreTable>
       <CoreDialog ref="modal" @cancel="getProjects" @confirm="getProjects">
         <template #form>
-          <ProjectNewProject dialog />
+          <ProjectFormsNewProject dialog />
         </template>
       </CoreDialog>
     </template>

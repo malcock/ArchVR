@@ -72,9 +72,10 @@ model Organisation {
   updatedAt  DateTime            @updatedAt
   customerId String?
   members    UserOrganisations[]
-  Projects   Project[]
+  projects   Project[]
   // Files      OrganisationFiles[]
   // Devices    Device[]
+  files      OrganisationFiles[]
 }
 
 model UserOrganisations {
@@ -100,6 +101,7 @@ model Project {
   projectRoles   ProjectRoles[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+  scenes         Scene[]
 }
 
 model ProjectRoles {
@@ -114,4 +116,55 @@ model ProjectRoles {
   updatedAt DateTime @updatedAt
 
   @@id([userId, projectId])
+}
+
+model Scene {
+  id        String       @id @unique @default(uuid())
+  name      String
+  projectId String
+  project   Project      @relation(fields: [projectId], references: [id])
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  files     SceneFiles[]
+  parentId  String?
+  parent    Scene?       @relation(name: "hierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children  Scene[]      @relation(name: "hierarchy")
+}
+
+model File {
+  id            String              @id @unique @default(uuid())
+  name          String
+  original      String
+  processed     String?
+  type          String
+  thumbnail     String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  organisations OrganisationFiles[]
+  scenes        SceneFiles[]
+}
+
+model OrganisationFiles {
+  organisationId String
+  fileId         String
+
+  file         File         @relation(fields: [fileId], references: [id])
+  organisation Organisation @relation(fields: [organisationId], references: [id])
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  @@id([organisationId, fileId])
+}
+
+model SceneFiles {
+  id        String   @id @unique @default(uuid())
+  name      String   @default("Unnamed Node")
+  sceneId   String
+  parentId  String?
+  transform String?
+  fileId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  file      File?    @relation(fields: [fileId], references: [id])
+  scene     Scene    @relation(fields: [sceneId], references: [id])
 }

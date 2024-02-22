@@ -8,12 +8,12 @@ import {
 import projectService from "~/services/project.service";
 import { searchOptionsSchema } from "~/schemas/apiOptions";
 import { Roles } from "~/enums/Roles";
-import permissionService from "~/services/permission.service";
 import { Permissions } from "~/enums/Permissions";
 
 export const projectRouter = router({
-  get: hasProjectPermission(Permissions.ViewProject)
+  get: protectedProcedure
     .input(z.object({ projectId: z.string() }))
+    .use(hasProjectPermission(Permissions.ViewProject))
     .query(({ input: { projectId } }) => {
       return projectService.get(projectId);
     }),
@@ -25,20 +25,27 @@ export const projectRouter = router({
     )
     .mutation(async ({ input, ctx }) => {
       const { organisationId } = ctx.session.user;
+      const project = await projectService.create(input.name, organisationId);
+      await projectService.setUserRole(
+        project.id,
+        ctx.session.user.id,
+        Roles.Owner
+      );
       // if(!permissionService.organisationPermission(ctx.session.user.))
-      return projectService.create(input.name, organisationId);
+      return project;
     }),
-  update: hasProjectPermission(Permissions.EditProject)
+  update: protectedProcedure
     .input(
       z.object({
         name: z.string(),
-        id: z.string(),
+        projectId: z.string(),
       })
     )
-    .mutation(({ input: { id, name } }) => {
-      return projectService.update(id, { name });
+    .use(hasProjectPermission(Permissions.ViewProject))
+    .mutation(({ input: { projectId, name } }) => {
+      return projectService.update(projectId, { name });
     }),
-  setUserRole: hasProjectPermission(Permissions.EditProjectRoles)
+  setUserRole: protectedProcedure
     .input(
       z.object({
         projectId: z.string(),
@@ -46,16 +53,18 @@ export const projectRouter = router({
         role: z.nativeEnum(Roles),
       })
     )
+    .use(hasProjectPermission(Permissions.ViewProject))
     .mutation(({ input: { projectId, role, userId } }) => {
       return projectService.setUserRole(projectId, userId, role);
     }),
-  removeUser: hasProjectPermission(Permissions.EditProjectRoles)
+  removeUser: protectedProcedure
     .input(
       z.object({
         projectId: z.string(),
         userId: z.string(),
       })
     )
+    .use(hasProjectPermission(Permissions.ViewProject))
     .mutation(({ input: { projectId, userId } }) => {
       return projectService.removeUser(projectId, userId);
     }),

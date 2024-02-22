@@ -14,6 +14,7 @@ const envSchema = z.object({
   AUTH_GITHUB_CLIENT_SECRET: z.string().optional(),
   AUTH_SENDGRID_SENDER: z.string().email(),
   AUTH_SENDGRID_API_KEY: z.string(),
+  AZURE_STORAGE_CONNECTION_STRING: z.string(),
 });
 
 const parsedSchema = envSchema.safeParse(process.env);

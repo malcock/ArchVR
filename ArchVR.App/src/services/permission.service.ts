@@ -10,6 +10,7 @@ class PermissionService {
     permission: Permissions
   ) {
     try {
+      console.log({ userId, projectId, permission });
       const role = Roles[
         (
           await prisma.projectRoles.findFirstOrThrow({

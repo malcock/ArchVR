@@ -57,10 +57,12 @@ const organisationPermissionsMiddleware = (permissionRequired: Permissions) =>
     });
   });
 
-const projectPermissionsMiddleware = (permissionRequired: Permissions) =>
+export const hasProjectPermission = (permissionRequired: Permissions) =>
   authMiddleware.unstable_pipe(({ ctx, input, next }) => {
     const { user } = ctx.session;
+    console.log("1", { input });
     const { projectId } = input as any;
+    console.log("2");
     if (!projectId) {
       throw new TRPCError({
         code: "BAD_REQUEST",
@@ -90,7 +92,6 @@ export const publicProcedure = t.procedure;
 export const protectedProcedure = t.procedure.use(authMiddleware);
 export const hasOrganisationPermission = (permissionRequired: Permissions) =>
   t.procedure.use(organisationPermissionsMiddleware(permissionRequired));
-export const hasProjectPermission = (permissionRequired: Permissions) =>
-  t.procedure.use(projectPermissionsMiddleware(permissionRequired));
+
 export const router = t.router;
 export const middleware = t.middleware;

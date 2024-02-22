@@ -1,5 +1,50 @@
 import { PrismaClient } from "@prisma/client";
 import { envConfig } from "~/envConfig";
+import {
+  StorageSharedKeyCredential,
+  generateBlobSASQueryParameters,
+  BlobSASPermissions,
+  BlobServiceClient,
+} from "@azure/storage-blob";
+
+const getStorageSharedKeyCredential = () => {
+  const connectionStringValues: Record<string, string> = {};
+  const keyValuePairStrings = (
+    process.env.AZURE_STORAGE_CONNECTION_STRING || ""
+  ).split(";");
+  Array.prototype.forEach.call(keyValuePairStrings, (keyValuePairString) => {
+    const keyValuePair = keyValuePairString.split("=");
+    const key = keyValuePair[0];
+    const value = keyValuePair[1];
+    connectionStringValues[key] = value;
+  });
+  return new StorageSharedKeyCredential(
+    connectionStringValues.AccountName,
+    connectionStringValues.AccountKey
+  );
+};
+
+const azureBlobStorageService = {
+  getBlobSasUri: (containerName: string, blobName: string) => {
+    const blobServiceClient = BlobServiceClient.fromConnectionString(
+      envConfig.AZURE_STORAGE_CONNECTION_STRING as string
+    );
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    const sasOptions = {
+      containerName: containerClient.containerName,
+      blobName,
+      startsOn: new Date(),
+      expiresOn: new Date(new Date().valueOf() + 3600 * 1000),
+      permissions: BlobSASPermissions.parse("r"),
+    };
+    const sasToken = generateBlobSASQueryParameters(
+      sasOptions,
+      getStorageSharedKeyCredential()
+    ).toString();
+    return `${blockBlobClient.url}?${sasToken}`;
+  },
+};
 
 import chalk from "chalk";
 
@@ -22,45 +67,29 @@ export const prisma =
             { emit: "event", level: "query" },
           ]
         : ["error"],
+  }).$extends({
+    result: {
+      file: {
+        thumbnail: {
+          needs: {
+            thumbnail: true,
+          },
+          compute(file) {
+            return file.thumbnail
+              ? azureBlobStorageService.getBlobSasUri("files", file.thumbnail)
+              : null;
+          },
+        },
+        processed: {
+          needs: {
+            processed: true,
+          },
+          compute(file) {
+            return file.processed
+              ? azureBlobStorageService.getBlobSasUri("files", file.processed)
+              : null;
+          },
+        },
+      },
+    },
   });
-// .$extends({
-//   query: {
-//     $allOperations: async (args) => {
-//       const before = Date.now();
-//       const result = await args.query;
-//       const after = Date.now();
-//       prismaLogger(`${args.model}.${args.operation} - ${after - before}ms`);
-//       return result;
-//     },
-//   },
-// });
-
-// prisma.$use(async (params, next) => {
-//   const before = Date.now();
-//   const result = await next(params);
-//   const after = Date.now();
-
-//   prismaLogger(`${params.model}.${params.action} - ${after - before}ms`);
-//   return result;
-// });
-
-// if (envConfig.NODE_ENV !== "production") {
-//   globalForPrisma.prisma = prisma;
-// }
-// import { PrismaClient } from "@prisma/client";
-// import { envConfig } from "~/envConfig";
-
-// const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
-
-// export const prisma =
-//   globalForPrisma.prisma ||
-//   new PrismaClient({
-//     log:
-//       envConfig.NODE_ENV === "development"
-//         ? ["query", "error", "warn"]
-//         : ["error"],
-//   });
-
-// if (envConfig.NODE_ENV !== "production") {
-//   globalForPrisma.prisma = prisma;
-// }

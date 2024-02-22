@@ -1,0 +1,22 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- AlterTable
+ALTER TABLE [dbo].[Scene] ADD [parentId] NVARCHAR(1000);
+
+-- AddForeignKey
+ALTER TABLE [dbo].[Scene] ADD CONSTRAINT [Scene_parentId_fkey] FOREIGN KEY ([parentId]) REFERENCES [dbo].[Scene]([id]) ON DELETE NO ACTION ON UPDATE NO ACTION;
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH

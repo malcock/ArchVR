@@ -1,0 +1,52 @@
+{
+  "name": "archvr-3d",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": {
+      "import": "./dist/archvr-3d.js",
+      "require": "./dist/archvr-3d.cjs"
+    }
+  },
+  "main": "./dist/archvr-3d.cjs",
+  "module": "./dist/archvr-3d.js",
+  "types": "./dist/archvr-3d.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "release": "pnpm test && pnpm build && changelogen --release && pnpm publish && git push --follow-tags",
+    "lint": "eslint . --fix",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest --coverage",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.6.4",
+    "@commitlint/cli": "^18.6.0",
+    "@commitlint/config-conventional": "^18.6.0",
+    "@types/node": "^20.11.16",
+    "@vitest/coverage-v8": "^1.2.2",
+    "camelcase": "^8.0.0",
+    "changelogen": "^0.5.5",
+    "eslint": "^8.56.0",
+    "husky": "^9.0.10",
+    "lint-staged": "^15.2.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12",
+    "vite-plugin-dts": "^3.7.2",
+    "vitest": "^1.2.2"
+  },
+  "lint-staged": {
+    "*.ts": "pnpm run lint"
+  },
+  "dependencies": {
+    "@babylonjs/core": "^6.43.0",
+    "@babylonjs/loaders": "^6.43.0",
+    "nanoid": "^5.0.5"
+  }
+}
