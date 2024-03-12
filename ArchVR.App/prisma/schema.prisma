@@ -73,9 +73,8 @@ model Organisation {
   customerId String?
   members    UserOrganisations[]
   projects   Project[]
-  // Files      OrganisationFiles[]
-  // Devices    Device[]
   files      OrganisationFiles[]
+  devices    Device[]
 }
 
 model UserOrganisations {
@@ -129,6 +128,7 @@ model Scene {
   parentId  String?
   parent    Scene?       @relation(name: "hierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   children  Scene[]      @relation(name: "hierarchy")
+  devices   Device[]
 }
 
 model File {
@@ -167,4 +167,22 @@ model SceneFiles {
   updatedAt DateTime @updatedAt
   file      File?    @relation(fields: [fileId], references: [id])
   scene     Scene    @relation(fields: [sceneId], references: [id])
+}
+
+model Device {
+  id             String       @id @unique @default(uuid())
+  name           String?
+  deviceType     String?
+  username       String?      @unique
+  password       String?
+  transform      String?
+  sceneId        String?
+  scene          Scene?       @relation(fields: [sceneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId       String?
+  parent         Device?      @relation(name: "hierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children       Device[]     @relation(name: "hierarchy")
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 }

@@ -1,9 +1,8 @@
 <script setup></script>
 <template>
   <div>
-    <SiteHeader />
-    <div class="container mx-auto">
+    <NuxtLayout>
       <NuxtPage />
-    </div>
+    </NuxtLayout>
   </div>
 </template>

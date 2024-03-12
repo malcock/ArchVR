@@ -50,7 +50,7 @@ onMounted(() => {
     <template #content>
       <CoreTable :items="scenes" :fields="fields">
         <template #cell(name)="data">
-          <NuxtLink :to="`/app/project/${projectId}/${data.item.id}`">{{
+          <NuxtLink :to="`/app/scene/${data.item.id}`">{{
             data.value
           }}</NuxtLink>
         </template>

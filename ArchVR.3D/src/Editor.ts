@@ -8,7 +8,7 @@ import {
 } from "@babylonjs/core";
 import { Observable } from "@babylonjs/core/Misc/observable";
 // import { SceneDto } from "../types/dtos/ProjectDtos";
-import { ModelLoader } from "./loaders/ModelLoader";
+// import { ModelLoader } from "./loaders/ModelLoader";
 import { UiMaterials } from "./ui/UiMaterial";
 import CameraRig from "./rigs/CameraRig";
 import { MetaLookupBehavior } from "./behaviors/MetaLookupBehavior";

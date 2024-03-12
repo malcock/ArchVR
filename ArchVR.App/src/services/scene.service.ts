@@ -43,10 +43,28 @@ class SceneService {
         files: true,
         children: true,
         parent: this.recursive(5),
+        project: true,
+        devices: {
+          select: {
+            id: true,
+            name: true,
+            transform: true,
+            deviceType: true,
+          },
+        },
       },
     });
   }
-
+  getProjectId(sceneId: string) {
+    return prisma.scene.findUniqueOrThrow({
+      where: {
+        id: sceneId,
+      },
+      select: {
+        projectId: true,
+      },
+    });
+  }
   async list(
     searchOptions: SearchOptions<Omit<Scene, "id" | "organisationId">> & {
       projectId?: string;
@@ -92,6 +110,17 @@ class SceneService {
         name,
         transform,
         parentId,
+      },
+    });
+  }
+
+  addDevice(sceneId: string, deviceId: string) {
+    return prisma.device.update({
+      where: {
+        id: deviceId,
+      },
+      data: {
+        sceneId,
       },
     });
   }

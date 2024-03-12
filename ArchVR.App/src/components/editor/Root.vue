@@ -1,20 +1,28 @@
 <script setup lang="ts">
-import EditorKey from "../../composables/EditorKey";
-const editor = inject(EditorKey);
+import { EditorKey, EditorBus } from "@/composables/EditorKeys";
+import type { SceneType } from "~/server/trpc/routers/scene";
+import type { EditorApp } from "~archvr3d/dist/archvr-3d";
+let editor = inject(EditorKey);
+
+let bus = useEventBus(EditorBus);
+
+bus.on((e, payload) => {
+  console.log("root", e);
+});
+
 const props = defineProps<{
-  scene: any;
+  scene: SceneType;
 }>();
 
 const bjsCanvas = ref<HTMLCanvasElement | null>(null);
-console.log("WHAG");
+
 onMounted(() => {
-  console.log("mounted");
   console.log({ editor });
   if (bjsCanvas.value && editor) {
     editor.createEditor(bjsCanvas.value);
     // editor.loadScene(props.scene);
-    console.log("available");
-    // useEditorObservables(editor, props.scene.id);
+
+    UseEditorObservables(editor, props.scene.id);
   }
 });
 
@@ -27,6 +35,7 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <EditorHeader />
   <div class="editor">
     <canvas
       class="editor-main"
@@ -34,7 +43,8 @@ onUnmounted(() => {
       width="300"
       height="200"
     ></canvas>
-    <!-- <EditorTools /> -->
+    <EditorTools />
+    <EditorAddModel :scene="scene" />
     <aside id="editorsidebar" class="editor-side">
       <!-- <EditorExplorer />
       <EditorPropertyPanel /> -->
@@ -53,6 +63,7 @@ onUnmounted(() => {
 }
 
 .editor-side {
-  @apply absolute flex flex-col bg-base-100 top-20 w-64 bottom-20 right-4 rounded-box overflow-hidden;
+  @apply absolute flex flex-col bg-base-100 top-20 w-64 bottom-20 right-2 rounded-box overflow-hidden;
 }
 </style>
+../../composables/EditorKeys

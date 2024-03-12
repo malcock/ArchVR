@@ -1,9 +1,11 @@
-import path from "path";
 import { envConfig } from "./src/envConfig";
+import { fileURLToPath } from "url";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  alias: { "~archvr3d": path.resolve(__dirname, "../ArchVR.3D") },
+  alias: {
+    "~archvr3d": fileURLToPath(new URL("../ArchVR.3D", import.meta.url)),
+  },
   srcDir: "src",
   css: ["~/assets/css/icons.css"],
   devtools: { enabled: true },

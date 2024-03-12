@@ -1,11 +1,51 @@
 <script lang="ts" setup>
 import { type MenuItem } from "../core/MenuItem.vue";
+import { EditorKey, EditorBus } from "@/composables/EditorKeys";
+
+let editor = inject(EditorKey);
+let bus = useEventBus(EditorBus);
+const ready = ref(false);
+editor?.onEditorReady.addOnce((val) => {
+  ready.value = val;
+});
 
 const { lastRefreshedAt, status, data, signOut } = useAuth();
 
 const isAuthenticated = computed(() => status.value === "authenticated");
 
 const authItems = ref<MenuItem[]>([
+  {
+    label: "File",
+    children: [
+      {
+        label: "New Scene",
+      },
+    ],
+  },
+  {
+    label: "Add",
+    children: [
+      {
+        label: "Model",
+        action: () => bus.emit("model.new"),
+      },
+      { label: "Widget", action: () => bus.emit("widget.new") },
+      { label: "Device", action: () => bus.emit("device.new") },
+    ],
+  },
+  {
+    label: "Object",
+    children: [
+      {
+        label: "Add Object",
+        action: () => console.log("open file browser"),
+      },
+    ],
+  },
+  {
+    label: "Widget",
+    children: [{ label: "Add Widget" }],
+  },
   {
     label: "Projects",
     url: "/app",
@@ -73,3 +113,4 @@ const items = computed(() =>
 </template>
 
 <style></style>
+~/composables/EditorKeys

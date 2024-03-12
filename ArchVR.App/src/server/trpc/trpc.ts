@@ -14,6 +14,7 @@ import { UserSession } from "~/services/auth.services";
 import permissionService from "~/services/permission.service";
 import { Roles } from "~/enums/Roles";
 import { Permissions } from "~/enums/Permissions";
+import sceneService from "~/services/scene.service";
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
@@ -38,7 +39,7 @@ const organisationPermissionsMiddleware = (permissionRequired: Permissions) =>
   authMiddleware.unstable_pipe(async ({ ctx, next }) => {
     const { user } = ctx.session;
     console.log("org perm middle", Permissions[permissionRequired], { user });
-    const hasPermssion = permissionService.organisationPermission(
+    const hasPermssion = await permissionService.organisationPermission(
       user.id,
       user.organisationId,
       permissionRequired
@@ -58,18 +59,53 @@ const organisationPermissionsMiddleware = (permissionRequired: Permissions) =>
   });
 
 export const hasProjectPermission = (permissionRequired: Permissions) =>
-  authMiddleware.unstable_pipe(({ ctx, input, next }) => {
+  authMiddleware.unstable_pipe(async ({ ctx, input, next }) => {
     const { user } = ctx.session;
-    console.log("1", { input });
     const { projectId } = input as any;
-    console.log("2");
     if (!projectId) {
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: "'projectId' missing from input",
       });
     }
-    const hasPermssion = permissionService.projectPermission(
+    const hasPermssion = await permissionService.projectPermission(
+      user.id,
+      projectId,
+      permissionRequired
+    );
+    if (!hasPermssion) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message:
+          "You do not have permission to perform that action on this project",
+      });
+    }
+    return next({
+      ctx: {
+        session: { ...ctx.session, user: ctx.session.user as UserSession },
+      },
+    });
+  });
+
+export const hasScenePermission = (permissionRequired: Permissions) =>
+  authMiddleware.unstable_pipe(async ({ ctx, input, next }) => {
+    const { user } = ctx.session;
+    const { sceneId } = input as any;
+    if (!sceneId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "'sceneId' missing from input",
+      });
+    }
+    const scene = await sceneService.getProjectId(sceneId);
+    const { projectId } = scene;
+    if (!projectId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "'projectId' missing from input",
+      });
+    }
+    const hasPermssion = await permissionService.projectPermission(
       user.id,
       projectId,
       permissionRequired

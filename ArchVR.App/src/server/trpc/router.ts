@@ -4,6 +4,7 @@ import { helloWorldRouter } from "./routers/helloWorld";
 import { projectRouter } from "./routers/project";
 import { sceneRouter } from "./routers/scene";
 import { fileRouter } from "./routers/files";
+import { deviceRouter } from "./routers/devices";
 
 export const appRouter = router({
   user: userRouter,
@@ -11,6 +12,7 @@ export const appRouter = router({
   project: projectRouter,
   scene: sceneRouter,
   file: fileRouter,
+  device: deviceRouter,
 });
 
 // export type definition of API
