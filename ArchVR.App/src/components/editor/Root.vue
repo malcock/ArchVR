@@ -16,10 +16,34 @@ const props = defineProps<{
 
 const bjsCanvas = ref<HTMLCanvasElement | null>(null);
 
-onMounted(() => {
+onMounted(async () => {
   console.log({ editor });
   if (bjsCanvas.value && editor) {
     editor.createEditor(bjsCanvas.value);
+
+    //go go scene loading procedure!
+    // load models
+    console.log("loading models");
+    // const modelLoaders = await Promise.all(props.scene.files.map(x=>editor!.call("model.add",{name:x.name,filepath:x.file!.processed as string, transform:x.transform as string})))
+    for (let i = 0; i < props.scene.files.length; i++) {
+      let file = props.scene.files[i];
+      console.log("loading file", file);
+      await editor.call("model.add", {
+        name: file.name,
+        filepath: file.file!.processed as string,
+        transform: file.transform as string,
+      });
+      console.log("loaded file", file);
+    }
+    console.log("loaded models");
+    //load devices
+    for (var device of props.scene.devices) {
+      editor.call("device.create", {
+        id: device.id,
+        transform: device.transform as string,
+      });
+    }
+    console.log("loaded devices");
     // editor.loadScene(props.scene);
 
     UseEditorObservables(editor, props.scene.id);

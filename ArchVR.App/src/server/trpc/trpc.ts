@@ -15,22 +15,33 @@ import permissionService from "~/services/permission.service";
 import { Roles } from "~/enums/Roles";
 import { Permissions } from "~/enums/Permissions";
 import sceneService from "~/services/scene.service";
+import deviceService from "~/services/device.service";
+import RolePermissions from "~/config/RolePermissions";
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
 });
 
+//// ARGH DO I MAKE IT GET A LIST OF ALL ORGS/Project
+//user has access?
+
 /**
  * Authentication middleware
  **/
-const authMiddleware = t.middleware(({ ctx, next }) => {
+const authMiddleware = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
-  console.log(ctx.session);
+
+  //get all user permissions when authed/ redis one day?
+  const permissions = await permissionService.getUserPermissions(
+    (ctx.session.user as UserSession).id
+  );
+
   return next({
     ctx: {
       session: { ...ctx.session, user: ctx.session.user as UserSession },
+      permissions,
     },
   });
 });
@@ -38,12 +49,14 @@ const authMiddleware = t.middleware(({ ctx, next }) => {
 const organisationPermissionsMiddleware = (permissionRequired: Permissions) =>
   authMiddleware.unstable_pipe(async ({ ctx, next }) => {
     const { user } = ctx.session;
-    console.log("org perm middle", Permissions[permissionRequired], { user });
-    const hasPermssion = await permissionService.organisationPermission(
-      user.id,
-      user.organisationId,
-      permissionRequired
-    );
+    const { permissions } = ctx;
+
+    const role = Roles[
+      permissions.organisations[user.organisationId]
+    ] as keyof typeof Roles;
+
+    const hasPermssion = RolePermissions[role].includes(permissionRequired);
+
     if (!hasPermssion) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -68,11 +81,50 @@ export const hasProjectPermission = (permissionRequired: Permissions) =>
         message: "'projectId' missing from input",
       });
     }
-    const hasPermssion = await permissionService.projectPermission(
-      user.id,
-      projectId,
-      permissionRequired
-    );
+    const { permissions } = ctx;
+
+    const role = Roles[permissions.projects[projectId]] as keyof typeof Roles;
+
+    const hasPermssion = RolePermissions[role].includes(permissionRequired);
+
+    if (!hasPermssion) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message:
+          "You do not have permission to perform that action on this project",
+      });
+    }
+    return next({
+      ctx: {
+        session: { ...ctx.session, user: ctx.session.user as UserSession },
+      },
+    });
+  });
+
+export const hasSceneDevicePermission = (permissionRequired: Permissions) =>
+  authMiddleware.unstable_pipe(async ({ ctx, input, next }) => {
+    const { user } = ctx.session;
+    const { deviceId } = input as any;
+    if (!deviceId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "'deviceId' missing from input",
+      });
+    }
+    const device = await deviceService.get(deviceId);
+    const { projectId } = device;
+    if (!projectId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "'projectId' missing from input",
+      });
+    }
+    const { permissions } = ctx;
+
+    const role = Roles[permissions.projects[projectId]] as keyof typeof Roles;
+
+    const hasPermssion = RolePermissions[role].includes(permissionRequired);
+
     if (!hasPermssion) {
       throw new TRPCError({
         code: "UNAUTHORIZED",
@@ -105,11 +157,12 @@ export const hasScenePermission = (permissionRequired: Permissions) =>
         message: "'projectId' missing from input",
       });
     }
-    const hasPermssion = await permissionService.projectPermission(
-      user.id,
-      projectId,
-      permissionRequired
-    );
+    const { permissions } = ctx;
+
+    const role = Roles[permissions.projects[projectId]] as keyof typeof Roles;
+
+    const hasPermssion = RolePermissions[role].includes(permissionRequired);
+
     if (!hasPermssion) {
       throw new TRPCError({
         code: "UNAUTHORIZED",

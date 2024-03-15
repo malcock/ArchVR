@@ -4,6 +4,36 @@ import { Roles } from "../enums/Roles";
 import { prisma } from "../services/prisma";
 
 class PermissionService {
+  async getUserPermissions(userId: string) {
+    const perms: {
+      organisations: Record<string, Roles>;
+      projects: Record<string, Roles>;
+    } = {
+      organisations: {},
+      projects: {},
+    };
+    perms.projects = (
+      await prisma.projectRoles.findMany({
+        where: {
+          userId,
+        },
+      })
+    ).reduce((obj: any, item) => {
+      obj[item.projectId] = item.role;
+      return obj;
+    }, {});
+    perms.organisations = (
+      await prisma.userOrganisations.findMany({
+        where: {
+          userId,
+        },
+      })
+    ).reduce((obj: any, item) => {
+      obj[item.organisationId] = item.role;
+      return obj;
+    }, {});
+    return perms;
+  }
   async projectPermission(
     userId: string,
     projectId: string,

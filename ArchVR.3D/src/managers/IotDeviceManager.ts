@@ -53,13 +53,17 @@ export class IotDeviceManager {
    * @param transform serialized transform as string
    */
   public static createDevice(scene: Scene, id: string, transform: string) {
-    const { parent, position } = DeserializeTransform(transform);
-    const root = scene.getNodeById(parent as string) as TransformNode;
-    console.log("createDevice!", scene, position, id);
-    const newDevice = new IotDevice(id, position, root);
-    console.log(newDevice);
-    this._devices.push(newDevice);
-    SelectionManager.setObjectSelection(newDevice);
+    return new Promise((resolve) => {
+      const { parent, position } = DeserializeTransform(transform);
+      const root = scene.getNodeById(parent as string) as TransformNode;
+      console.log("createDevice!", scene, position, id);
+      const newDevice = new IotDevice(id, position, root);
+      console.log(newDevice);
+      this._devices.push(newDevice);
+      SelectionManager.setObjectSelection(newDevice);
+
+      return resolve(true);
+    });
   }
 
   public static isDevice(device: any) {

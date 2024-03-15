@@ -12,24 +12,28 @@ export class ModelManager {
     name: string,
     filepath: string,
     transform: string
-  ) {
-    const { position, parent } = DeserializeTransform(transform);
-    let root: TransformNode;
-    if (parent) {
-      root = scene.getNodeById(parent as string) as TransformNode;
-    } else {
-      root = EditorApp.root;
-    }
-
-    const model = new ModelLoader(name, filepath, scene, root, (models) => {
-      for (var m of models) {
-        m.position = position;
+  ): Promise<boolean> {
+    return new Promise((resolve) => {
+      const { position, parent } = DeserializeTransform(transform);
+      let root: TransformNode;
+      if (parent) {
+        root = scene.getNodeById(parent as string) as TransformNode;
+      } else {
+        root = EditorApp.root;
       }
-      console.log("models loaded", models);
-      setTimeout(() => {
-        SelectionManager.selectNone();
-      }, 5);
+
+      const model = new ModelLoader(name, filepath, scene, root, (models) => {
+        for (var m of models) {
+          m.position = position;
+        }
+        console.log("models loaded", models);
+        setTimeout(() => {
+          SelectionManager.selectNone();
+        }, 5);
+
+        resolve(true);
+      });
+      model.loadModel();
     });
-    model.loadModel();
   }
 }

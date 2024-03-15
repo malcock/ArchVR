@@ -3,30 +3,13 @@ import { prisma } from "./prisma";
 import type { SearchOptions } from "./types/SearchOptions";
 import PaginatedResponse from "./types/PaginatedResponse";
 class DeviceService {
-  create(data: {
-    name: string;
-    organisationId: string;
-    deviceType?: string;
-    sceneId?: string;
-    transform?: string;
-    parentId?: string;
-  }) {
+  create(data: Omit<Device, "id" | "createdAt" | "updatedAt">) {
     return prisma.device.create({
       data,
     });
   }
 
-  update(
-    id: string,
-    data: {
-      name: string;
-      organisationId: string;
-      deviceType?: string;
-      sceneId?: string;
-      transform?: string;
-      parentId?: string;
-    }
-  ) {
+  update(id: string, data: Omit<Device, "id" | "createdAt" | "updatedAt">) {
     return prisma.device.update({
       where: {
         id,
@@ -51,14 +34,12 @@ class DeviceService {
     });
   }
 
-  async list(
-    searchOptions: SearchOptions<"name"> & { organisationId?: string }
-  ) {
-    const { orderBy, organisationId, skip, sortDirection, take, term } =
+  async list(searchOptions: SearchOptions<"name"> & { projectId?: string }) {
+    const { orderBy, projectId, skip, sortDirection, take, term } =
       searchOptions;
 
     const whereClause: Prisma.DeviceWhereInput = {
-      ...(organisationId && { organisationId }),
+      ...(projectId && { projectId }),
       ...(term && {
         name: {
           contains: term,

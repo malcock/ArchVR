@@ -3,16 +3,20 @@ import { IotDeviceManager } from "./managers/IotDeviceManager";
 import { ModelManager } from "./managers/ModelManager";
 
 const ApiFunctionMap = {
-  "model.add": (options: {
+  "model.add": async (options: {
     scene: Scene;
     name: string;
     filepath: string;
     transform: string;
   }) => {
     const { filepath, name, scene, transform } = options;
-    ModelManager.loadModel(scene, name, filepath, transform);
+    return ModelManager.loadModel(scene, name, filepath, transform);
   },
-  "device.create": (options: { scene: Scene; id: string; transform: string }) =>
+  "device.create": async (options: {
+    scene: Scene;
+    id: string;
+    transform: string;
+  }) =>
     IotDeviceManager.createDevice(options.scene, options.id, options.transform),
 };
 

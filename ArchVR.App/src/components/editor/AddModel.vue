@@ -22,32 +22,18 @@ bus.on((e) => {
 });
 
 const selectedFile = ref<PrismaFile | null>(null);
-const onSubmit = () => {
+const onSubmit = async () => {
   if (!selectedFile.value) return;
-  trpc().scene.addFile.mutate({
+  const sceneFile = await trpc().scene.addFile.mutate({
     fileId: selectedFile.value.id,
     sceneId: props.scene.id,
+    transform: `{"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0},"scaling":{"x":1,"y":1,"z":1}}`,
   });
+
   editor?.call("model.add", {
-    name: selectedFile.value.name,
-    filepath: selectedFile.value.processed as string,
-    transform: `{
-    "position": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-    },
-    "rotation": {
-        "x": 0,
-        "y": 0,
-        "z": 0
-    },
-    "scaling": {
-        "x": 1,
-        "y": 1,
-        "z": 1
-    }
-}`,
+    name: sceneFile.name,
+    filepath: sceneFile.file!.processed as string,
+    transform: sceneFile.transform as string,
   });
 };
 </script>

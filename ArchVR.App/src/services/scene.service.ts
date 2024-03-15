@@ -40,16 +40,27 @@ class SceneService {
     return prisma.scene.findUniqueOrThrow({
       where: { id },
       include: {
-        files: true,
+        files: {
+          select: {
+            file: {
+              select: {
+                processed: true,
+                thumbnail: true,
+              },
+            },
+            fileId: true,
+            transform: true,
+            name: true,
+          },
+        },
         children: true,
         parent: this.recursive(5),
         project: true,
         devices: {
           select: {
             id: true,
-            name: true,
             transform: true,
-            deviceType: true,
+            deviceId: true,
           },
         },
       },
@@ -111,15 +122,49 @@ class SceneService {
         transform,
         parentId,
       },
+      include: {
+        file: {
+          select: {
+            processed: true,
+            thumbnail: true,
+          },
+        },
+      },
     });
   }
 
-  addDevice(sceneId: string, deviceId: string) {
-    return prisma.device.update({
+  addDevice(sceneId: string, transform: string) {
+    return prisma.sceneDevices.create({
+      data: {
+        sceneId,
+        transform,
+      },
+    });
+  }
+
+  setSceneDevice(sceneDeviceId: string, deviceId: string, transform: string) {
+    return prisma.sceneDevices.update({
       where: {
-        id: deviceId,
+        id: sceneDeviceId,
       },
       data: {
+        deviceId,
+        transform,
+      },
+    });
+  }
+
+  getSceneDevice(id: string) {
+    return prisma.sceneDevices.findFirstOrThrow({
+      where: {
+        id,
+      },
+    });
+  }
+
+  listSceneDevices(sceneId: string) {
+    return prisma.sceneDevices.findMany({
+      where: {
         sceneId,
       },
     });

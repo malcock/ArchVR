@@ -42,6 +42,17 @@ export const sceneRouter = router({
     .mutation(({ input: { fileId, sceneId, name, parentId, transform } }) => {
       return sceneService.addFile(sceneId, fileId, name, parentId, transform);
     }),
+  addDevice: protectedProcedure
+    .input(
+      z.object({
+        sceneId: z.string(),
+        transform: z.string(),
+      })
+    )
+    .use(hasScenePermission(Permissions.EditProject))
+    .mutation(({ input: { sceneId, transform } }) => {
+      return sceneService.addDevice(sceneId, transform);
+    }),
   list: protectedProcedure
     .input(
       searchOptionsSchema.merge(
@@ -58,4 +69,4 @@ export const sceneRouter = router({
     }),
 });
 
-export type SceneType = Awaited<ReturnType<typeof sceneService.get>;>
+export type SceneType = Awaited<ReturnType<typeof sceneService.get>>;

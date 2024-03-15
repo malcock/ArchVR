@@ -258,14 +258,14 @@ export class EditorApp {
     return buildChildren(EditorApp.root);
   }
 
-  call<T extends keyof typeof ApiFunctionMap>(
+  async call<T extends keyof typeof ApiFunctionMap>(
     fn: T,
     options: Omit<Parameters<(typeof ApiFunctionMap)[typeof fn]>[0], "scene">
   ) {
     console.log(options);
     var opts = { scene: this.scene!, ...options };
     //@ts-ignore - options returns as a union type for some reason...
-    ApiFunctionMap[fn](opts);
+    await ApiFunctionMap[fn](opts);
 
     // prep cmd to be emitted by an MQTT client
     // mqtt client code will decide whether to call()
