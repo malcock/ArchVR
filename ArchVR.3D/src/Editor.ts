@@ -115,12 +115,12 @@ export class EditorApp {
 
     this.currentTool = this.tools.select;
 
-    // const sidebar = document.getElementById("editorsidebar");
+    const header = document.getElementById("editorheader");
     // Resizing
     function resizeCanvas(canvas: HTMLCanvasElement) {
       console.log(window);
       canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.height = window.innerHeight - header!.clientHeight;
       engine.resize();
     }
     resizeCanvas(canvas);

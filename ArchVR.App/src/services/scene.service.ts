@@ -1,4 +1,4 @@
-import { Prisma, type Scene } from "@prisma/client";
+import { Prisma, type Scene, type SceneWidgets } from "@prisma/client";
 import { prisma } from "./prisma";
 import type { SearchOptions } from "./types/SearchOptions";
 import PaginatedResponse from "./types/PaginatedResponse";
@@ -61,6 +61,26 @@ class SceneService {
             id: true,
             transform: true,
             deviceId: true,
+          },
+        },
+        widgets: {
+          select: {
+            id: true,
+            name: true,
+            widgetType: {
+              select: {
+                component: true,
+                name: true,
+              },
+            },
+            position: true,
+            deviceId: true,
+            graph: {
+              select: {
+                id: true,
+                file: true,
+              },
+            },
           },
         },
       },
@@ -167,6 +187,43 @@ class SceneService {
       where: {
         sceneId,
       },
+    });
+  }
+
+  addWidget(sceneId: string, widgetTypeId?: string, name?: string) {
+    return prisma.sceneWidgets.create({
+      data: {
+        sceneId,
+        name,
+        widgetTypeId,
+      },
+      select: {
+        id: true,
+        name: true,
+        widgetType: {
+          select: {
+            component: true,
+            name: true,
+          },
+        },
+        position: true,
+        deviceId: true,
+        graph: {
+          select: {
+            id: true,
+            file: true,
+          },
+        },
+      },
+    });
+  }
+
+  setWidget(id: string, data: Partial<SceneWidgets>) {
+    return prisma.sceneWidgets.update({
+      where: {
+        id,
+      },
+      data,
     });
   }
 }

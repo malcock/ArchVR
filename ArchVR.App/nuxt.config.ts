@@ -28,4 +28,12 @@ export default defineNuxtConfig({
     },
   },
   tailwindcss: {},
+  vite: {
+    vue: {
+      script: {
+        defineModel: true,
+        propsDestructure: true,
+      },
+    },
+  },
 });

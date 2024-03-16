@@ -129,6 +129,8 @@ model Scene {
   parent    Scene?         @relation(name: "hierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   children  Scene[]        @relation(name: "hierarchy")
   devices   SceneDevices[]
+  widgets   SceneWidgets[]
+  graphs    SceneGraph[]
 }
 
 model File {
@@ -185,6 +187,7 @@ model Device {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   scenes     SceneDevices[]
+  widgets    SceneWidgets[]
 }
 
 model SceneDevices {
@@ -196,4 +199,37 @@ model SceneDevices {
   updatedAt DateTime @updatedAt
   device    Device?  @relation(fields: [deviceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   scene     Scene    @relation(fields: [sceneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model WidgetType {
+  id           String         @id @unique @default(uuid())
+  name         String
+  component    String
+  sceneWidgets SceneWidgets[]
+}
+
+model SceneWidgets {
+  id           String      @id @unique @default(uuid())
+  name         String      @default("New Widget")
+  deviceId     String?
+  device       Device?     @relation(fields: [deviceId], references: [id])
+  graph        SceneGraph?
+  sceneId      String
+  scene        Scene       @relation(fields: [sceneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  widgetTypeId String?
+  widgetType   WidgetType? @relation(fields: [widgetTypeId], references: [id])
+  position     String      @default("{'x':92,'y':92,'w':128,'h':128}")
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model SceneGraph {
+  id            String        @id @unique @default(uuid())
+  file          String //just storing as JSON for now
+  sceneId       String
+  scene         Scene         @relation(fields: [sceneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sceneWidgetId String?       @unique
+  sceneWidget   SceneWidgets? @relation(fields: [sceneWidgetId], references: [id])
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }

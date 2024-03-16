@@ -53,6 +53,17 @@ export const sceneRouter = router({
     .mutation(({ input: { sceneId, transform } }) => {
       return sceneService.addDevice(sceneId, transform);
     }),
+  addWidget: protectedProcedure
+    .input(
+      z.object({
+        sceneId: z.string(),
+        widgetTypeId: z.string().optional(),
+        name: z.string().optional(),
+      })
+    )
+    .query(({ input: { sceneId, widgetTypeId, name } }) => {
+      return sceneService.addWidget(sceneId, widgetTypeId, name);
+    }),
   list: protectedProcedure
     .input(
       searchOptionsSchema.merge(
@@ -69,4 +80,7 @@ export const sceneRouter = router({
     }),
 });
 
+type PropertyType<T, K extends keyof T> = T[K];
+type ArrayType<T> = T extends (infer U)[] ? U : never;
 export type SceneType = Awaited<ReturnType<typeof sceneService.get>>;
+export type SceneWidgetType = ArrayType<PropertyType<SceneType, "widgets">>;

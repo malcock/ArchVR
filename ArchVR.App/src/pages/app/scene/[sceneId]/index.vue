@@ -26,7 +26,7 @@ definePageMeta({
 <template>
   <div id="editorwnd">
     <!-- <div>{{ scene.name }}</div> -->
-    <EditorRoot v-if="scene" :scene="scene" />
+    <EditorRoot v-if="scene" :scene="scene" v-model="scene" />
     <!-- <EditorRoot :scene="scene" /> -->
     <!-- <GraphEditor /> -->
   </div>

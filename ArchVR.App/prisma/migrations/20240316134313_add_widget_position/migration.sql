@@ -1,0 +1,19 @@
+BEGIN TRY
+
+BEGIN TRAN;
+
+-- AlterTable
+ALTER TABLE [dbo].[SceneWidgets] ADD [position] NVARCHAR(1000) NOT NULL CONSTRAINT [SceneWidgets_position_df] DEFAULT '{x:92,y:92,w:128,h:128}';
+
+COMMIT TRAN;
+
+END TRY
+BEGIN CATCH
+
+IF @@TRANCOUNT > 0
+BEGIN
+    ROLLBACK TRAN;
+END;
+THROW
+
+END CATCH

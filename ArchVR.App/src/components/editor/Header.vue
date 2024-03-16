@@ -66,7 +66,7 @@ const items = computed(() =>
 </script>
 
 <template>
-  <header class="navbar bg-base-100">
+  <header class="navbar bg-base-100" id="editorheader">
     <div class="navbar-start">
       <div class="dropdown">
         <div tabindex="0" role="button" class="btn btn-ghost">

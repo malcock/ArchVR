@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { EditorKey, EditorBus } from "@/composables/EditorKeys";
-import type { SceneType } from "~/server/trpc/routers/scene";
-import type { EditorApp } from "~archvr3d/dist/archvr-3d";
+import type { SceneType, SceneWidgetType } from "~/server/trpc/routers/scene";
 let editor = inject(EditorKey);
 
 let bus = useEventBus(EditorBus);
@@ -14,6 +13,9 @@ const props = defineProps<{
   scene: SceneType;
 }>();
 
+const sceneCopy = ref(JSON.parse(JSON.stringify(props.scene)));
+// const scene = defineModel<SceneType>({ required: true });
+
 const bjsCanvas = ref<HTMLCanvasElement | null>(null);
 
 onMounted(async () => {
@@ -24,9 +26,9 @@ onMounted(async () => {
     //go go scene loading procedure!
     // load models
     console.log("loading models");
-    // const modelLoaders = await Promise.all(props.scene.files.map(x=>editor!.call("model.add",{name:x.name,filepath:x.file!.processed as string, transform:x.transform as string})))
-    for (let i = 0; i < props.scene.files.length; i++) {
-      let file = props.scene.files[i];
+    // const modelLoaders = await Promise.all(sceneCopy.value.files.map(x=>editor!.call("model.add",{name:x.name,filepath:x.file!.processed as string, transform:x.transform as string})))
+    for (let i = 0; i < sceneCopy.value.files.length; i++) {
+      let file = sceneCopy.value.files[i];
       console.log("loading file", file);
       await editor.call("model.add", {
         name: file.name,
@@ -37,16 +39,16 @@ onMounted(async () => {
     }
     console.log("loaded models");
     //load devices
-    for (var device of props.scene.devices) {
+    for (var device of sceneCopy.value.devices) {
       editor.call("device.create", {
         id: device.id,
         transform: device.transform as string,
       });
     }
     console.log("loaded devices");
-    // editor.loadScene(props.scene);
+    // editor.loadScene(sceneCopy.value);
 
-    UseEditorObservables(editor, props.scene.id);
+    UseEditorObservables(editor, sceneCopy.value.id);
   }
 });
 
@@ -56,6 +58,10 @@ onUnmounted(() => {
   //@ts-ignore
   editor = null;
 });
+
+const widgetAdded = (widget: SceneWidgetType) => {
+  sceneCopy.value.widgets.push(widget);
+};
 </script>
 
 <template>
@@ -67,8 +73,10 @@ onUnmounted(() => {
       width="300"
       height="200"
     ></canvas>
+    <EditorWidgets v-model="sceneCopy" />
     <EditorTools />
-    <EditorAddModel :scene="scene" />
+    <EditorAddModel :scene="sceneCopy" />
+    <EditorAddWidget :scene="sceneCopy" @added="widgetAdded" />
     <aside id="editorsidebar" class="editor-side">
       <!-- <EditorExplorer />
       <EditorPropertyPanel /> -->
