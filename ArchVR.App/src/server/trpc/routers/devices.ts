@@ -9,6 +9,7 @@ import {
 } from "../trpc";
 import { Permissions } from "~/enums/Permissions";
 import deviceService from "~/services/device.service";
+import { searchOptionsSchema } from "~/schemas/apiOptions";
 
 const deviceCreateUpdateSchema = z.object({
   name: z.string().optional(),
@@ -81,4 +82,21 @@ export const deviceRouter = router({
     .query(({ input: { deviceId } }) => {
       return deviceService.get(deviceId);
     }),
+  list: protectedProcedure
+    .input(
+      searchOptionsSchema.merge(
+        z.object({
+          projectId: z.string().optional(),
+          orderBy: z.enum(["name", "updatedAt", "createdAt"]).optional(),
+        })
+      )
+    )
+    .query(({ input }) => {
+      return deviceService.list(input);
+    }),
 });
+
+// type PropertyType<T, K extends keyof T> = T[K];
+// type ArrayType<T> = T extends (infer U)[] ? U : never;
+export type DeviceType = Awaited<ReturnType<typeof deviceService.get>>;
+// export type SceneWidgetType = ArrayType<PropertyType<SceneType, "widgets">>;

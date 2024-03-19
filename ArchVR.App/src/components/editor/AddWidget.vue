@@ -15,9 +15,7 @@ const modal = ref<InstanceType<typeof CoreDialog>>();
 let bus = useEventBus(EditorBus);
 
 bus.on((e) => {
-  console.log(e);
   if (e === "widget.new") {
-    console.log("new ob!");
     modal.value?.show();
   }
 });

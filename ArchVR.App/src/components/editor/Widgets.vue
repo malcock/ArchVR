@@ -12,14 +12,13 @@ import {
 
 let editor = inject(EditorKey);
 
-const props = defineProps<{ modelValue: SceneType[] }>();
+const props = defineProps<{ modelValue: SceneType }>();
 const emit = defineEmits<{ "update:modelValue": [data: SceneType] }>();
 // const scene = defineModel({type:typeof SceneType});
 
 let bus = useEventBus(EditorBus);
 
 bus.on((e) => {
-  console.log(e);
   if (e === "widget.new") {
     console.log("new ob!");
   }
@@ -27,13 +26,19 @@ bus.on((e) => {
 
 const gridSize = ref(32);
 
-const getComponent = (kind: string) => {
+const getComponent = (
+  kind: { name: string; component: string } | null = null
+) => {
   const componentMap = {
     line: EditorWidgetsLine,
     kpi: EditorWidgetsKpi,
   };
-  return kind in componentMap
-    ? componentMap[kind as keyof typeof componentMap]
+  if (!kind) {
+    return EditorWidgetsBlank;
+  }
+  // may need an "unknown widget type" in future?
+  return kind.component in componentMap
+    ? componentMap[kind.component as keyof typeof componentMap]
     : EditorWidgetsBlank;
 };
 
@@ -49,7 +54,7 @@ const showGrid = ref(false);
   <div class="widget-backdrop" :style="gridStyle"></div>
   <component
     v-for="widget in modelValue.widgets"
-    :is="getComponent(widget.widgetType.component)"
+    :is="getComponent(widget.widgetType)"
     :widget="widget"
     @onStart="showGrid = true"
     @onEnd="showGrid = false"

@@ -17,6 +17,7 @@ import { Permissions } from "~/enums/Permissions";
 import sceneService from "~/services/scene.service";
 import deviceService from "~/services/device.service";
 import RolePermissions from "~/config/RolePermissions";
+import graphService from "~/services/graph.service";
 
 const t = initTRPC.context<Context>().create({
   transformer: superjson,
@@ -113,6 +114,44 @@ export const hasSceneDevicePermission = (permissionRequired: Permissions) =>
     }
     const device = await deviceService.get(deviceId);
     const { projectId } = device;
+    if (!projectId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "'projectId' missing from input",
+      });
+    }
+    const { permissions } = ctx;
+
+    const role = Roles[permissions.projects[projectId]] as keyof typeof Roles;
+
+    const hasPermssion = RolePermissions[role].includes(permissionRequired);
+
+    if (!hasPermssion) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message:
+          "You do not have permission to perform that action on this project",
+      });
+    }
+    return next({
+      ctx: {
+        session: { ...ctx.session, user: ctx.session.user as UserSession },
+      },
+    });
+  });
+
+export const hasSceneWidgetPermission = (permissionRequired: Permissions) =>
+  authMiddleware.unstable_pipe(async ({ ctx, input, next }) => {
+    const { user } = ctx.session;
+    const { graphId } = input as any;
+    if (!graphId) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "'graphId' missing from input",
+      });
+    }
+    const projectId = await graphService.getProjectId(graphId);
+
     if (!projectId) {
       throw new TRPCError({
         code: "BAD_REQUEST",

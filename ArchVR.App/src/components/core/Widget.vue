@@ -1,9 +1,21 @@
 <script setup lang="ts">
-const props = defineProps<{ position: string; name: string }>();
+import type { GraphIO } from "~/rete/types";
+import type { SceneWidgetType } from "~/server/trpc/routers/scene";
+import { useGraphStore } from "~/store/Graph.Store";
+
+const trpc = useTrpc();
+const bus = useEventBus(EditorBus);
+
+const graphStore = useGraphStore();
+
+const props = defineProps<{
+  widget: SceneWidgetType;
+  initialGraph: () => GraphIO;
+}>();
 const emit = defineEmits(["onStart", "onEnd"]);
 
 const pos = reactive<{ x: number; y: number; w: number; h: number }>(
-  JSON.parse(props.position)
+  JSON.parse(props.widget.position)
 );
 const el = ref<HTMLElement | null>(null);
 const handle = ref<HTMLElement | null>(null);
@@ -15,19 +27,50 @@ const { x, y, style } = useDraggable(el, {
     y: pos.y,
   },
   axis: "both",
-  onStart: () => emit("onStart"),
+  onMove: () => emit("onStart"),
   onEnd: () => emit("onEnd"),
 });
 
 const fullStyle = computed(
   () => `width:${pos.w}px;height:${pos.h}px;left:${x.value}px;top:${y.value}px;`
 );
+
+const openGraph = async () => {
+  if (!props.widget.graph) {
+    console.log("no has graph");
+    const newGraph = await trpc().graph.createSceneWidgetGraph.mutate({
+      sceneId: props.widget.sceneId,
+      file: props.initialGraph(),
+      sceneWidgetId: props.widget.id,
+    });
+    props.widget.graph = { file: newGraph.file, id: newGraph.id };
+  }
+  const graph =
+    typeof props.widget.graph.file === "string"
+      ? (JSON.parse(props.widget.graph.file) as GraphIO)
+      : (props.widget.graph.file as GraphIO);
+  graphStore.currentGraph = {
+    ...graph,
+    id: props.widget.graph.id,
+  };
+
+  bus.emit("widget.open", { graphId: props.widget.graph.id });
+};
+
+watch(
+  () => graphStore.editorOpen,
+  (newVal) => {
+    if (!newVal && graphStore.currentGraph) {
+    }
+  }
+);
 </script>
 
 <template>
   <div class="widget" ref="el" :style="fullStyle" style="position: fixed">
     <div class="widget-handle" ref="handle">
-      <div class="widget-title">{{ name }}</div>
+      <div class="widget-title">{{ widget.name }}</div>
+      <button @click="openGraph">[*]</button>
     </div>
     <div class="widget-body">
       <slot />
@@ -40,7 +83,7 @@ const fullStyle = computed(
   @apply bg-base-100 absolute rounded;
 
   &-handle {
-    @apply cursor-move px-2 py-1;
+    @apply cursor-move px-2 py-1 flex justify-between;
   }
   &-body {
     @apply p-2;

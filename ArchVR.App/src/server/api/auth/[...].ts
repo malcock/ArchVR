@@ -64,7 +64,6 @@ export default NuxtAuthHandler({
     // Specify here the payload of your token and session
     jwt: async ({ token, trigger, user, profile, account, session }) => {
       // console.log({ token, t rigger, user, profile, account, session });
-      console.log("jwt", { user });
       if (trigger === "signIn") {
         token.user =
           user || (await getUserSession({ email: token.email as string }));

@@ -66,6 +66,7 @@ class SceneService {
         widgets: {
           select: {
             id: true,
+            sceneId: true,
             name: true,
             widgetType: {
               select: {
@@ -83,6 +84,7 @@ class SceneService {
             },
           },
         },
+        graphs: true,
       },
     });
   }

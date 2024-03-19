@@ -1,0 +1,219 @@
+//rete imports
+import { ClassicPreset, type GetSchemes, NodeEditor } from "rete";
+import { DataflowEngine } from "rete-engine";
+import { AreaPlugin } from "rete-area-plugin";
+import { type VueArea2D, VuePlugin, Presets } from "rete-vue-plugin";
+import {
+  type ContextMenuExtra,
+  ContextMenuPlugin,
+  Presets as ContextMenuPresets,
+} from "rete-context-menu-plugin";
+import {
+  ConnectionPlugin,
+  Presets as ConnectionPresets,
+} from "rete-connection-plugin";
+import {
+  AutoArrangePlugin,
+  Presets as ArrangePresets,
+} from "rete-auto-arrange-plugin";
+
+//relative imports
+import { SelectField } from "./controls/select-field";
+import SelectUI from "./controls/SelectUI.vue";
+import * as Nodes from "./nodes";
+import type { ConnProps, Node } from "./types";
+export type Schemes = GetSchemes<Node, ConnProps>;
+type AreaExtra = VueArea2D<Schemes> | ContextMenuExtra;
+
+// other imports
+import type { GraphType } from "~/server/trpc/routers/graph";
+import type { DeviceType } from "~/server/trpc/routers/devices";
+import { debounce } from "./util";
+import type { GraphIO } from "./types";
+import { exportEditor, importEditor } from "./import-export";
+import { GraphObservable } from "./GraphObservable";
+/**
+ * general purpose graph manager tool
+ * responsible for running all graphs in the scene
+ * and handling the display of the editor
+ */
+
+type UpdateTransformFunc = (
+  transformId: string,
+  transform: {
+    position?: Array<number>;
+    rotation?: Array<number>;
+    scaling?: Array<number>;
+  }
+) => void;
+type UpdateWidgetFunc = (widgetId: string, data: any) => void;
+type DeviceLookupFunc = (term: string) => Promise<DeviceType[]>;
+export type GraphContext = {
+  process: () => void;
+  editor: NodeEditor<Schemes>;
+  activeEditor: NodeEditor<Schemes>;
+  deviceList: DeviceType[];
+  deviceLookup: DeviceLookupFunc;
+  updateTransform: UpdateTransformFunc;
+  updateWidget: UpdateWidgetFunc;
+  addDeviceHook: (hook: (obj: { deviceId: string; data: any }) => void) => void;
+  updateControl?: (control: ClassicPreset.InputControl<"number">) => void;
+  updateNode?: (n: Node) => void;
+};
+
+export class GraphManager {
+  graphs: GraphType[] = [];
+  ctx!: GraphContext;
+  editor: NodeEditor<Schemes>;
+  engine: DataflowEngine<Schemes>;
+  activeEditor: NodeEditor<Schemes>;
+  private _deviceObservable = new GraphObservable<{
+    deviceId: string;
+    data: any;
+  }>();
+
+  /**
+   * Create base editor and engine, without render context
+   * @param deviceLookup
+   * @param updateTransform
+   * @param updateWidget
+   */
+  constructor(
+    deviceList: DeviceType[],
+    deviceLookup: DeviceLookupFunc,
+    updateTransform: UpdateTransformFunc,
+    updateWidget: UpdateWidgetFunc
+  ) {
+    const editor = new NodeEditor<Schemes>();
+    const engine = new DataflowEngine<Schemes>();
+    this.activeEditor = new NodeEditor<Schemes>();
+
+    function _process() {
+      engine.reset();
+
+      editor
+        .getNodes()
+        .filter(
+          (n) =>
+            n instanceof Nodes.TransformOutput ||
+            n instanceof Nodes.WidgetOutput
+        )
+        .forEach((n) => engine.fetch(n.id));
+    }
+    this.editor = editor;
+    this.engine = engine;
+    const process = debounce(_process, 100);
+    const addDeviceHook = (
+      hook: (obj: { deviceId: string; data: any }) => void
+    ) => {
+      this._deviceObservable.subscribe(hook);
+    };
+
+    this.ctx = {
+      activeEditor: this.activeEditor,
+      deviceList,
+      deviceLookup,
+      updateTransform,
+      updateWidget,
+      process,
+      addDeviceHook,
+      editor: this.editor,
+    };
+  }
+
+  async createEditor(container: HTMLElement) {
+    const area = new AreaPlugin<Schemes, AreaExtra>(container);
+    const connection = new ConnectionPlugin<Schemes>();
+    const arrange = new AutoArrangePlugin<Schemes>();
+    const render = new VuePlugin<Schemes, AreaExtra>();
+    const contextMenu = new ContextMenuPlugin<Schemes>({
+      items: ContextMenuPresets.classic.setup([
+        [
+          "Input",
+          [
+            ["Device", () => new Nodes.DeviceInput(this.ctx, { deviceId: "" })],
+            // ["Texture", () => new Nodes.InputTexture(di, { name: '' })],
+          ],
+        ],
+        [
+          "Output",
+          [
+            [
+              "Transform",
+              () => new Nodes.TransformOutput(this.ctx, { transformId: "" }),
+            ],
+          ],
+        ],
+      ]),
+    });
+
+    render.addPreset(Presets.contextMenu.setup({ delay: 200 }));
+    render.addPreset(Presets.classic.setup());
+    render.addPreset(
+      Presets.classic.setup({
+        customize: {
+          control(data) {
+            if (data.payload instanceof SelectField) return SelectUI;
+
+            if (data.payload instanceof ClassicPreset.InputControl) {
+              return Presets.classic.Control;
+            }
+          },
+        },
+      })
+    );
+    connection.addPreset(ConnectionPresets.classic.setup());
+    arrange.addPreset(ArrangePresets.classic.setup());
+
+    area.use(contextMenu);
+    area.use(connection);
+    area.use(render);
+    area.use(arrange);
+    // add missing updaters to ctx
+    this.ctx.updateNode = (node: Node) => area.update("node", node.id);
+    this.ctx.updateControl = (c: ClassicPreset.InputControl<"number">) =>
+      area.update("control", c.id);
+
+    //active editor is the one that you use!
+    this.activeEditor.use(area);
+    return {
+      destroy: () => area.destroy(),
+    };
+  }
+
+  async loadGraph(graph: GraphType) {
+    const index = this.graphs.findIndex((x) => x.id === graph.id);
+    if (index > -1) {
+      //if the graph is already in the manager, remove it from the editor context
+      this.graphs.splice(index, 1);
+    }
+    this.graphs.push(graph);
+
+    // just clear everything and start again
+    await this.editor.clear();
+    for (var g of this.graphs) {
+      const gIO: GraphIO =
+        typeof g.file === "string" ? JSON.parse(g.file) : g.file;
+      await importEditor(this.ctx, gIO);
+    }
+  }
+
+  updateDevice(obj: { deviceId: string; data: any }) {
+    this._deviceObservable.notify(obj);
+  }
+
+  async setActiveGraph(graph: GraphType) {
+    //make sure the graph is loaded in main context
+    const index = this.graphs.findIndex((x) => x.id === graph.id);
+    if (index > -1) {
+      await this.loadGraph(graph);
+    }
+    const gIO: GraphIO =
+      typeof graph.file === "string" ? JSON.parse(graph.file) : graph.file;
+    await importEditor(this.ctx, gIO, "activeEditor");
+  }
+
+  async saveActiveGraph() {
+    return exportEditor(this.ctx.activeEditor);
+  }
+}

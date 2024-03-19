@@ -34,7 +34,7 @@ class DeviceService {
     });
   }
 
-  async list(searchOptions: SearchOptions<"name"> & { projectId?: string }) {
+  async list(searchOptions: SearchOptions<Device> & { projectId?: string }) {
     const { orderBy, projectId, skip, sortDirection, take, term } =
       searchOptions;
 

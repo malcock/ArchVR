@@ -17,6 +17,7 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "@vee-validate/nuxt",
     "@vueuse/nuxt",
+    "@pinia/nuxt",
   ],
   auth: {
     baseURL: envConfig.AUTH_ORIGIN,

@@ -81,6 +81,7 @@ const widgetAdded = (widget: SceneWidgetType) => {
       <!-- <EditorExplorer />
       <EditorPropertyPanel /> -->
     </aside>
+    <EditorGraphEditor />
   </div>
 </template>
 
