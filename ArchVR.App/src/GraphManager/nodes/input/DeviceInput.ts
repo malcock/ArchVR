@@ -48,9 +48,9 @@ export class DeviceInput extends ClassicPreset.Node implements DataflowNode {
             );
             break;
         }
+        // console.log(this.device?.topic, "updated", data);
+        ctx.process();
       }
-
-      ctx.process();
     };
     ctx.addDeviceHook(onDeviceDataReceived);
     this.addControl("deviceId", sel);

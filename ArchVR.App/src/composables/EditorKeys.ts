@@ -9,6 +9,7 @@ type EditorBusTypes =
   | "widget.new"
   | "device.new"
   | "widget.update"
-  | "widget.open";
+  | "widget.open"
+  | "graph.open";
 
 export const EditorBus: EventBusKey<EditorBusTypes> = Symbol("Editor");

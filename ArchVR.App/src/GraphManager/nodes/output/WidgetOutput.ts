@@ -1,7 +1,7 @@
 import { ClassicPreset } from "rete";
 import type { DataflowNode } from "rete-engine";
 import sockets from "../../sockets";
-import { type DiContainer } from "../..";
+import { type GraphContext } from "../..";
 import { Vector } from "../../types/Vector";
 
 type Data = {
@@ -16,7 +16,7 @@ export class WidgetOutput extends ClassicPreset.Node implements DataflowNode {
   widgetId: string;
   updateWidget: (widgetId: string, data: any) => void;
 
-  constructor(di: DiContainer, data: Data) {
+  constructor(di: GraphContext, data: Data) {
     super("Widget Output");
     console.log("Widget Output node created", data);
     this.update = di.updateControl;
@@ -35,6 +35,7 @@ export class WidgetOutput extends ClassicPreset.Node implements DataflowNode {
   }
 
   data(inputs: any) {
+    // console.log(inputs);
     // console.log(inputs);
     const value = inputs.data;
     // const position =
@@ -64,6 +65,7 @@ export class WidgetOutput extends ClassicPreset.Node implements DataflowNode {
     // to be removed...?
     if (value && value[0]) {
       var val = JSON.stringify(value[0]);
+
       // console.log(this.controls);
       (this.controls?.value as ClassicPreset.InputControl<"text">).setValue(
         val

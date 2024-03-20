@@ -28,7 +28,7 @@ type AreaExtra = VueArea2D<Schemes> | ContextMenuExtra;
 // other imports
 import type { GraphType } from "~/server/trpc/routers/graph";
 import type { DeviceType } from "~/server/trpc/routers/devices";
-import { debounce } from "./util";
+import { debounce, throttle } from "./util";
 import type { GraphIO } from "./types";
 import { exportEditor, importEditor } from "./import-export";
 import { GraphObservable } from "./GraphObservable";
@@ -67,10 +67,12 @@ export class GraphManager {
   editor: NodeEditor<Schemes>;
   engine: DataflowEngine<Schemes>;
   activeEditor: NodeEditor<Schemes>;
+  private _currentGraph: GraphType | null = null;
   private _deviceObservable = new GraphObservable<{
     deviceId: string;
     data: any;
   }>();
+  arrange!: AutoArrangePlugin<Schemes, never>;
 
   /**
    * Create base editor and engine, without render context
@@ -86,8 +88,8 @@ export class GraphManager {
   ) {
     const editor = new NodeEditor<Schemes>();
     const engine = new DataflowEngine<Schemes>();
-    this.activeEditor = new NodeEditor<Schemes>();
-
+    const activeEditor = new NodeEditor<Schemes>();
+    editor.use(engine);
     function _process() {
       engine.reset();
 
@@ -101,8 +103,10 @@ export class GraphManager {
         .forEach((n) => engine.fetch(n.id));
     }
     this.editor = editor;
+    this.activeEditor = activeEditor;
     this.engine = engine;
-    const process = debounce(_process, 100);
+
+    const process = throttle(_process, 100);
     const addDeviceHook = (
       hook: (obj: { deviceId: string; data: any }) => void
     ) => {
@@ -165,17 +169,19 @@ export class GraphManager {
     connection.addPreset(ConnectionPresets.classic.setup());
     arrange.addPreset(ArrangePresets.classic.setup());
 
+    //active editor is the one that you use!
+    this.activeEditor.use(area);
+    this.arrange = arrange;
     area.use(contextMenu);
     area.use(connection);
     area.use(render);
     area.use(arrange);
     // add missing updaters to ctx
     this.ctx.updateNode = (node: Node) => area.update("node", node.id);
-    this.ctx.updateControl = (c: ClassicPreset.InputControl<"number">) =>
+    this.ctx.updateControl = (c: ClassicPreset.InputControl<"number">) => {
       area.update("control", c.id);
+    };
 
-    //active editor is the one that you use!
-    this.activeEditor.use(area);
     return {
       destroy: () => area.destroy(),
     };
@@ -199,6 +205,7 @@ export class GraphManager {
   }
 
   updateDevice(obj: { deviceId: string; data: any }) {
+    // console.log({ obj });
     this._deviceObservable.notify(obj);
   }
 
@@ -208,12 +215,18 @@ export class GraphManager {
     if (index > -1) {
       await this.loadGraph(graph);
     }
+    this._currentGraph = graph;
     const gIO: GraphIO =
       typeof graph.file === "string" ? JSON.parse(graph.file) : graph.file;
     await importEditor(this.ctx, gIO, "activeEditor");
+
+    await this.arrange.layout();
   }
 
   async saveActiveGraph() {
-    return exportEditor(this.ctx.activeEditor);
+    return {
+      graphId: this._currentGraph?.id,
+      file: exportEditor(this.ctx.activeEditor),
+    };
   }
 }

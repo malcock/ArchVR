@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { GraphIO } from "~/rete/types";
+import type { GraphIO } from "~/GraphManager/types";
 import type { SceneWidgetType } from "~/server/trpc/routers/scene";
 import { useGraphStore } from "~/store/Graph.Store";
 
@@ -12,7 +12,7 @@ const props = defineProps<{
   widget: SceneWidgetType;
   initialGraph: () => GraphIO;
 }>();
-const emit = defineEmits(["onStart", "onEnd"]);
+const emit = defineEmits(["onStart", "onEnd", "dataReceived"]);
 
 const pos = reactive<{ x: number; y: number; w: number; h: number }>(
   JSON.parse(props.widget.position)
@@ -64,6 +64,14 @@ watch(
     }
   }
 );
+
+bus.on((e, payload) => {
+  if (e === "widget.update") {
+    if (payload.widgetId === props.widget.id) {
+      emit("dataReceived", payload.data);
+    }
+  }
+});
 </script>
 
 <template>
@@ -72,7 +80,7 @@ watch(
       <div class="widget-title">{{ widget.name }}</div>
       <button @click="openGraph">[*]</button>
     </div>
-    <div class="widget-body">
+    <div class="widget-body h-full">
       <slot />
     </div>
   </div>

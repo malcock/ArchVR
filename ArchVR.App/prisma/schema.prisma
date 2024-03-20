@@ -230,6 +230,8 @@ model SceneGraph {
   scene         Scene         @relation(fields: [sceneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   sceneWidgetId String?       @unique
   sceneWidget   SceneWidgets? @relation(fields: [sceneWidgetId], references: [id])
+  objectId      String? // TODO: reference an object in scene 
+  transformId   String? // reference a 3d transform by ID
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 }

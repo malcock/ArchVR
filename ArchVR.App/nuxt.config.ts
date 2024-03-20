@@ -10,7 +10,7 @@ export default defineNuxtConfig({
   css: ["~/assets/css/icons.css"],
   devtools: { enabled: true },
   build: {
-    transpile: ["trpc-nuxt"],
+    transpile: ["trpc-nuxt", "echarts"],
   },
   modules: [
     "@sidebase/nuxt-auth",

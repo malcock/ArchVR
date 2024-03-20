@@ -6,7 +6,7 @@ let editor = inject(EditorKey);
 let bus = useEventBus(EditorBus);
 
 bus.on((e, payload) => {
-  console.log("root", e);
+  // console.log("root", e);
 });
 
 const props = defineProps<{
@@ -78,10 +78,10 @@ const widgetAdded = (widget: SceneWidgetType) => {
     <EditorAddModel :scene="sceneCopy" />
     <EditorAddWidget :scene="sceneCopy" @added="widgetAdded" />
     <aside id="editorsidebar" class="editor-side">
-      <!-- <EditorExplorer />
-      <EditorPropertyPanel /> -->
+      <!-- <EditorExplorer /> -->
+      <EditorPropertyPanel />
     </aside>
-    <EditorGraphEditor />
+    <EditorNodeEditor :scene="sceneCopy" />
   </div>
 </template>
 
@@ -99,4 +99,3 @@ const widgetAdded = (widget: SceneWidgetType) => {
   @apply absolute flex flex-col bg-base-100 top-20 w-64 bottom-20 right-2 rounded-box overflow-hidden;
 }
 </style>
-../../composables/EditorKeys

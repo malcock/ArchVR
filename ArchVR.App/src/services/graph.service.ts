@@ -1,13 +1,33 @@
-import type { GraphIO } from "~/rete/types";
+import type { GraphIO } from "~/GraphManager/types";
 import { prisma } from "./prisma";
 
 class GraphService {
-  create(sceneId: string, sceneWidgetId?: string, file?: GraphIO) {
+  createSceneWidgetGraph(
+    sceneId: string,
+    sceneWidgetId?: string,
+    file?: GraphIO
+  ) {
     return prisma.sceneGraph.create({
       data: {
         sceneId,
         sceneWidgetId,
         file: file ? JSON.stringify(file) : "",
+      },
+    });
+  }
+
+  createObjectTransformGraph(
+    sceneId: string,
+    objectId: string,
+    transformId: string,
+    file: GraphIO
+  ) {
+    return prisma.sceneGraph.create({
+      data: {
+        file: file ? JSON.stringify(file) : "",
+        sceneId,
+        objectId,
+        transformId,
       },
     });
   }
@@ -23,18 +43,21 @@ class GraphService {
     });
   }
 
+  getByObjectTransform(objectId: string, transformId: string) {
+    return prisma.sceneGraph.findFirstOrThrow({
+      where: {
+        transformId,
+        objectId,
+      },
+    });
+  }
+
   async get(graphId: string) {
-    const graph = await prisma.sceneGraph.findFirstOrThrow({
+    return prisma.sceneGraph.findFirstOrThrow({
       where: {
         id: graphId,
       },
     });
-
-    const { file, ...rest } = graph;
-    return {
-      ...rest,
-      file: JSON.parse(file) as GraphIO,
-    };
   }
   async getProjectId(graphId: string) {
     return (

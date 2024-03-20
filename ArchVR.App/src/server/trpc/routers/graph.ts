@@ -38,7 +38,25 @@ export const graphRouter = router({
     )
     .use(hasScenePermission(Permissions.EditProject))
     .mutation(({ input: { file, sceneId, sceneWidgetId } }) => {
-      return graphService.create(sceneId, sceneWidgetId, file);
+      return graphService.createSceneWidgetGraph(sceneId, sceneWidgetId, file);
+    }),
+  createObjectTransformGraph: protectedProcedure
+    .input(
+      z.object({
+        file: GraphIOSchema,
+        sceneId: z.string(),
+        objectId: z.string(),
+        transformId: z.string(),
+      })
+    )
+    .use(hasScenePermission(Permissions.EditProject))
+    .mutation(({ input: { file, objectId, sceneId, transformId } }) => {
+      return graphService.createObjectTransformGraph(
+        sceneId,
+        objectId,
+        transformId,
+        file
+      );
     }),
   update: protectedProcedure
     .input(
@@ -60,6 +78,17 @@ export const graphRouter = router({
     .use(hasSceneWidgetPermission(Permissions.ViewProject))
     .query(({ input: { graphId } }) => {
       return graphService.get(graphId);
+    }),
+  getByObjectTransform: protectedProcedure
+    .input(
+      z.object({
+        transformId: z.string(),
+        objectId: z.string(),
+      })
+    )
+    .use(hasSceneWidgetPermission(Permissions.ViewProject))
+    .query(({ input: { objectId, transformId } }) => {
+      return graphService.getByObjectTransform(objectId, transformId);
     }),
 });
 export type GraphType = Awaited<ReturnType<typeof graphService.get>>;
