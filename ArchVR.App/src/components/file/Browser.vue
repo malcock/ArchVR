@@ -20,6 +20,10 @@ const selectFile = (data: PrismaFile) => {
   currentFile.value = data;
   emit("selected", data);
 };
+
+const getThumbnail = (path: string | null = null) => {
+  return path || "/nothumb.png";
+};
 </script>
 
 <template>
@@ -33,7 +37,11 @@ const selectFile = (data: PrismaFile) => {
           '!border-primary': currentFile && currentFile.id === data.id,
         }"
       >
-        <img class="thumb" :src="data.thumbnail" :alt="data.name" />
+        <img
+          class="thumb"
+          :src="getThumbnail(data.thumbnail)"
+          :alt="data.name"
+        />
         <p class="text-sm mt-2">{{ data.name }}</p>
         <p class="text-xs text-neutral-content">
           Uploaded: {{ new Date(data.createdAt).toLocaleString() }}

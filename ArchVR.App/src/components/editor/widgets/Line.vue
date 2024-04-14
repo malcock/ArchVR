@@ -8,12 +8,15 @@ import VChart, { THEME_KEY } from "vue-echarts";
 use([GridComponent, LineChart, CanvasRenderer]);
 provide(THEME_KEY, "dark");
 
+const chart = ref<InstanceType<typeof VChart>>();
+
 import { customAlphabet } from "nanoid";
 import type { GraphIO } from "~/GraphManager/types";
 
 const nanoid = customAlphabet("1234567890abcdef", 16);
 
 import type { SceneType, SceneWidgetType } from "~/server/trpc/routers/scene";
+import type { EChartsOption } from "echarts";
 const props = defineProps<{ widget: SceneWidgetType }>();
 
 const initialGraph = () => ({
@@ -29,38 +32,45 @@ const initialGraph = () => ({
   connections: [],
 });
 
-const dataHistory = ref<{ t: number; d: any }[]>([]);
+const dataHistory = ref<{ name: string; value: any }[]>([]);
 
 const gotData = (d: any) => {
-  const newD = { t: Date.now(), d: d.data };
+  const now = new Date();
+  const newD = {
+    name: now.toString(),
+    value: [now.toISOString(), d.data],
+  };
   dataHistory.value.push(newD);
   if (dataHistory.value.length > 99) dataHistory.value.shift();
+  if (chart.value)
+    chart.value.setOption({
+      series: {
+        data: dataHistory.value,
+      },
+    });
 };
 
-const options = computed(() => {
-  return {
-    xAxis: {
-      type: "category",
-      data: dataHistory.value.map((x) => x.t),
+const options = ref<EChartsOption>({
+  xAxis: {
+    type: "time",
+  },
+  yAxis: {
+    type: "value",
+  },
+  series: [
+    {
+      data: [],
+      type: "line",
+      smooth: false,
     },
-    yAxis: {
-      type: "value",
-    },
-    series: [
-      {
-        data: dataHistory.value.map((x) => x.d),
-        type: "line",
-        smooth: false,
-      },
-    ],
-    grid: {
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      containLabel: true, // This ensures that labels are inside the chart area
-    },
-  };
+  ],
+  grid: {
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    containLabel: true, // This ensures that labels are inside the chart area
+  },
 });
 </script>
 
@@ -71,7 +81,7 @@ const options = computed(() => {
     @data-received="gotData"
   >
     <client-only>
-      <v-chart class="chart h-32" :option="options" />
+      <v-chart ref="chart" class="chart h-32" :option="options" />
     </client-only>
   </CoreWidget>
 </template>

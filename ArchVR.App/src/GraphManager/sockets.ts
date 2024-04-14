@@ -21,9 +21,23 @@ const Vector2 = new Socket("Vector2");
 const Vector3 = new Socket("Vector3");
 const Vector4 = new Socket("Vector4");
 
+const VectorOnly = new Socket("VectorOnly");
+
 const Image = new Socket("Image");
 
-Number.combine(Vector2, Vector3, Vector4);
-Vector2.combine(Number, Vector3, Vector4);
+const Text = new Socket("Text");
 
-export default { Number, Vector2, Vector3, Vector4, Image };
+Number.combine(Vector2, Vector3, Vector4);
+Vector2.combine(Number, VectorOnly);
+Vector3.combine(Number, VectorOnly);
+Vector4.combine(Number, VectorOnly);
+
+export default {
+  Number,
+  Vector2,
+  Vector3,
+  Vector4,
+  Image,
+  Text,
+  VectorOnly,
+};

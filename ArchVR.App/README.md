@@ -1,75 +1,68 @@
-# Nuxt 3 Minimal Starter
+# ArchVR.App
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+Main Nuxt App, Front and Backend.
+
+Built with TRPC, Next Auth, Vee Validate, Zod, Prisma, ReteJS, BabylonJS and ❤️
 
 ## Setup
 
-Make sure to install the dependencies:
+Here's how to setup
+
+### 1. Build dependencies
+
+You must build the 3D Editor as an external dependency
+
+Go to the ArchVR.3D and...
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
+npm i
 npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
 ```
 
-Locally preview production build:
+install dependencies here too
 
 ```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
+npm i
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### 2. Setup envars
+
+Copy .env.example into .env
+
+```bash
+cp .env.example .env
+```
+
+### 3. Spin up DB
+
+assuming you've got docker
+
+```bash
+  docker-compose up
+```
+
+### 4. Run Migrations
+
+```bash
+npm run prisma:migrate
+```
+
+### 5. Run dev
+
+```bash
+npm run dev
+```
+
+Hopefully you'll be able to visit `http://localhost:3000`:
+
+### 6. Create an account
+
+You can use the shoddy local thing I wrote or github whatever
+
+### 7. Create things
+
+1. Upload a couple of models - provided in TDVP.Files
+2. Create a project
+3. Create a scene
+4. Add a model if you wanna
+5. Add a widget

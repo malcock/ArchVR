@@ -28,7 +28,7 @@ type AreaExtra = VueArea2D<Schemes> | ContextMenuExtra;
 // other imports
 import type { GraphType } from "~/server/trpc/routers/graph";
 import type { DeviceType } from "~/server/trpc/routers/devices";
-import { debounce, throttle } from "./util";
+import { debounce, getConnectionSockets, throttle } from "./util";
 import type { GraphIO } from "./types";
 import { exportEditor, importEditor } from "./import-export";
 import { GraphObservable } from "./GraphObservable";
@@ -106,7 +106,20 @@ export class GraphManager {
     this.activeEditor = activeEditor;
     this.engine = engine;
 
-    const process = throttle(_process, 100);
+    activeEditor.addPipe((context) => {
+      if (context.type === "connectioncreate") {
+        const { data } = context;
+        const { source, target } = getConnectionSockets(activeEditor, data);
+        console.log({ source, target });
+        if (!source.isCompatibleWith(target)) {
+          console.log("Sockets are not compatible", "error");
+          return;
+        }
+      }
+      return context;
+    });
+
+    const process = throttle(_process, 33);
     const addDeviceHook = (
       hook: (obj: { deviceId: string; data: any }) => void
     ) => {
@@ -137,6 +150,16 @@ export class GraphManager {
           [
             ["Device", () => new Nodes.DeviceInput(this.ctx, { deviceId: "" })],
             // ["Texture", () => new Nodes.InputTexture(di, { name: '' })],
+          ],
+        ],
+        [
+          "Vector",
+          [
+            [
+              "Combiner",
+              () =>
+                new Nodes.VectorCombiner(this.ctx, { x: 0, y: 0, z: 0, w: 0 }),
+            ],
           ],
         ],
         [

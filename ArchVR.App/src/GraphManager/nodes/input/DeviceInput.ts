@@ -13,7 +13,7 @@ export class DeviceInput extends ClassicPreset.Node implements DataflowNode {
   static ID = "Device Input";
   device?: DeviceType;
   val: any;
-  width = 220;
+  width = 240;
   height = 220;
   constructor(public ctx: GraphContext, data: Data) {
     super("Device Input");
@@ -74,9 +74,11 @@ export class DeviceInput extends ClassicPreset.Node implements DataflowNode {
     if (this.device) {
       //add outputs based on the device unitType
       if (this.hasOutput("value")) this.removeOutput("value");
-      if (this.hasControl("name")) this.removeControl("name");
-      if (this.hasControl("deviceType")) this.removeControl("deviceType");
-      if (this.hasControl("unit")) this.removeControl("unit");
+
+      if (this.hasOutput("name")) this.removeOutput("name");
+      if (this.hasOutput("deviceType")) this.removeOutput("deviceType");
+      if (this.hasOutput("unit")) this.removeOutput("unit");
+
       switch (this.device.unitType) {
         case "number":
           console.log("adding number");
@@ -84,6 +86,7 @@ export class DeviceInput extends ClassicPreset.Node implements DataflowNode {
             "value",
             new ClassicPreset.Output(sockets.Number, "Value")
           );
+
           break;
         case "vector2":
           this.addOutput(
@@ -105,28 +108,24 @@ export class DeviceInput extends ClassicPreset.Node implements DataflowNode {
           break;
       }
 
-      //now add informational controls
-      this.addControl(
+      this.addOutput(
         "name",
-        new ClassicPreset.InputControl("text", {
-          initial: this.device.name,
-          readonly: true,
-        })
+        new ClassicPreset.Output(sockets.Text, `name: ${this.device.name}`)
       );
-      this.addControl(
+
+      this.addOutput(
         "deviceType",
-        new ClassicPreset.InputControl("text", {
-          initial: this.device.deviceType,
-          readonly: true,
-        })
+        new ClassicPreset.Output(
+          sockets.Text,
+          `type: ${this.device.deviceType}`
+        )
       );
-      this.addControl(
+
+      this.addOutput(
         "unit",
-        new ClassicPreset.InputControl("text", {
-          initial: this.device.unit,
-          readonly: true,
-        })
+        new ClassicPreset.Output(sockets.Text, `unit: ${this.device.unit}`)
       );
+
       if (this.ctx.updateNode) this.ctx.updateNode(this);
     }
   }
@@ -134,6 +133,9 @@ export class DeviceInput extends ClassicPreset.Node implements DataflowNode {
   data() {
     return {
       value: this.val,
+      name: this.device?.name,
+      deviceType: this.device?.deviceType,
+      unit: this.device?.unit,
     };
   }
 

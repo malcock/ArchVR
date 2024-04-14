@@ -37,10 +37,12 @@ class FileService {
               ? fileTypes[ext as keyof typeof fileTypes]
               : "unknown";
           };
+          const ext = filepath.split(".").pop();
           return prisma.file.create({
             data: {
               id,
               original: filepath,
+              ...(ext === "glb" && { processed: filepath }),
               name: file.name as string,
               type: getType(filepath),
             },

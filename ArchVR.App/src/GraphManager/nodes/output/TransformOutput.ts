@@ -31,9 +31,9 @@ export class TransformOutput
     console.log("transform node created", data);
     this.update = di.updateControl;
     this.updateTransform = di.updateTransform;
-    const position = new ClassicPreset.Input(sockets.Vector3, "Position");
-    const rotation = new ClassicPreset.Input(sockets.Vector3, "Rotation");
-    const scaling = new ClassicPreset.Input(sockets.Vector3, "Scaling");
+    const position = new ClassicPreset.Input(sockets.VectorOnly, "Position");
+    const rotation = new ClassicPreset.Input(sockets.VectorOnly, "Rotation");
+    const scaling = new ClassicPreset.Input(sockets.VectorOnly, "Scaling");
     this.transformId = data.transformId;
     this.addControl(
       "value",
@@ -50,7 +50,7 @@ export class TransformOutput
   data(inputs: any) {
     // console.log(inputs);
     const value = inputs.position;
-    console.log(inputs);
+    // console.log(inputs);
     const position =
       inputs["position"] && inputs["position"][0] instanceof Vector
         ? inputs["position"][0].toArray()

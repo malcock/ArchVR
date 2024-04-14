@@ -47,13 +47,15 @@ onMounted(async () => {
   // fake some values
   const {} = useDeviceFaker(graphManager);
 });
-bus.on((e, p) => {
+bus.on(async (e, p) => {
   if (e === "widget.open") {
     //we've received a command - yay
     const { graphId } = p;
     if (graphManager && graphId) {
       //get the right graph and load it
-      const graph = props.scene.graphs.find((x) => x.id === graphId);
+      let graph = props.scene.graphs.find((x) => x.id === graphId);
+      //failed to get from scene, attempt to get from API - needs improvment!!
+      if (!graph) graph = await trpc().graph.get.query({ graphId });
       if (graph) graphManager.setActiveGraph(graph);
 
       isOpen.value = true;

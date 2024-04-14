@@ -7,6 +7,7 @@ import {
 } from "../trpc";
 import { Permissions } from "~/enums/Permissions";
 import graphService from "~/services/graph.service";
+import sceneService from "~/services/scene.service";
 
 export const ConnectionSchema = z.object({
   source: z.string(),
@@ -37,8 +38,10 @@ export const graphRouter = router({
       })
     )
     .use(hasScenePermission(Permissions.EditProject))
-    .mutation(({ input: { file, sceneId, sceneWidgetId } }) => {
-      return graphService.createSceneWidgetGraph(sceneId, sceneWidgetId, file);
+    .mutation(async ({ input: { file, sceneId, sceneWidgetId } }) => {
+      const g = await graphService.createSceneWidgetGraph(sceneId, file);
+      await sceneService.setWidget(sceneWidgetId, { graphId: g.id });
+      return g;
     }),
   createObjectTransformGraph: protectedProcedure
     .input(
@@ -86,7 +89,7 @@ export const graphRouter = router({
         objectId: z.string(),
       })
     )
-    .use(hasSceneWidgetPermission(Permissions.ViewProject))
+
     .query(({ input: { objectId, transformId } }) => {
       return graphService.getByObjectTransform(objectId, transformId);
     }),

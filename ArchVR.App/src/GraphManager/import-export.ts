@@ -11,6 +11,7 @@ export async function createNode(ctx: GraphContext, name: string, data: any) {
     [Nodes.DeviceInput.ID]: () => new Nodes.DeviceInput(ctx, data),
     [Nodes.TransformOutput.ID]: () => new Nodes.TransformOutput(ctx, data),
     [Nodes.WidgetOutput.ID]: () => new Nodes.WidgetOutput(ctx, data),
+    [Nodes.VectorCombiner.ID]: () => new Nodes.VectorCombiner(ctx, data),
   };
   const matched = nodes[name];
 

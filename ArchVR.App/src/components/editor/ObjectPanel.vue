@@ -3,6 +3,7 @@ import { computed, inject, ref } from "vue";
 import IfcGroup from "./ifc/IfcGroup.vue";
 import IfcPropertySet from "./ifc/IfcPropertySet.vue";
 import IfcMaterialLayerSetUsage from "./ifc/IfcMaterialLayerSetUsage.vue";
+import IfcGenericProperty from "./ifc/IfcGenericProperty.vue";
 import type { EditorSelection } from "~archvr3d";
 import { useGraphStore } from "../../store/Graph.Store";
 import { customAlphabet } from "nanoid";

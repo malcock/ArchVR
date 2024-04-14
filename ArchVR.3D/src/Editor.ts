@@ -285,7 +285,7 @@ export class EditorApp {
       scaling?: Array<number>;
     }
   ) {
-    console.log("editor updateTransform", transformId, transform);
+    // console.log("editor updateTransform", transformId, transform);
     if (!transformId) return;
     // perhaps this can be cached?
 

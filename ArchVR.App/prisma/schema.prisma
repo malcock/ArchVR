@@ -187,7 +187,6 @@ model Device {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   scenes     SceneDevices[]
-  widgets    SceneWidgets[]
 }
 
 model SceneDevices {
@@ -211,27 +210,25 @@ model WidgetType {
 model SceneWidgets {
   id           String      @id @unique @default(uuid())
   name         String      @default("New Widget")
-  deviceId     String?
-  device       Device?     @relation(fields: [deviceId], references: [id])
-  graph        SceneGraph?
+  graphId      String?     @unique
+  graph        SceneGraph? @relation(fields: [graphId], references: [id])
   sceneId      String
   scene        Scene       @relation(fields: [sceneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   widgetTypeId String?
   widgetType   WidgetType? @relation(fields: [widgetTypeId], references: [id])
-  position     String      @default("{'x':92,'y':92,'w':128,'h':128}")
+  position     String      @default("{\"x\":92,\"y\":92,\"w\":256,\"h\":128}")
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 }
 
 model SceneGraph {
-  id            String        @id @unique @default(uuid())
-  file          String //just storing as JSON for now
-  sceneId       String
-  scene         Scene         @relation(fields: [sceneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  sceneWidgetId String?       @unique
-  sceneWidget   SceneWidgets? @relation(fields: [sceneWidgetId], references: [id])
-  objectId      String? // TODO: reference an object in scene 
-  transformId   String? // reference a 3d transform by ID
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id          String        @id @unique @default(uuid())
+  file        String //just storing as JSON for now
+  sceneId     String
+  scene       Scene         @relation(fields: [sceneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  objectId    String? // TODO: reference an object in scene 
+  transformId String? // reference a 3d transform by ID
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  widget      SceneWidgets?
 }

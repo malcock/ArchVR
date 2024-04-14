@@ -75,7 +75,7 @@ class SceneService {
               },
             },
             position: true,
-            deviceId: true,
+
             graph: {
               select: {
                 id: true,
@@ -209,7 +209,7 @@ class SceneService {
           },
         },
         position: true,
-        deviceId: true,
+        sceneId: true,
         graph: {
           select: {
             id: true,

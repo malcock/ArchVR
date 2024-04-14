@@ -2,15 +2,10 @@ import type { GraphIO } from "~/GraphManager/types";
 import { prisma } from "./prisma";
 
 class GraphService {
-  createSceneWidgetGraph(
-    sceneId: string,
-    sceneWidgetId?: string,
-    file?: GraphIO
-  ) {
+  createSceneWidgetGraph(sceneId: string, file?: GraphIO) {
     return prisma.sceneGraph.create({
       data: {
         sceneId,
-        sceneWidgetId,
         file: file ? JSON.stringify(file) : "",
       },
     });

@@ -8,7 +8,7 @@ const deviceOptions = {
     data: () => Math.random() * 6 + 16,
   },
   "UK.SHF.BLD.Cell1.MA1.spindle": {
-    interval: 120,
+    interval: 16,
     data: () => Math.sin(Date.now() / 1e3),
   },
   "UK.SHF.BLD.Cell1.MA1.heat": {
