@@ -3,8 +3,10 @@ version: '3.7'
 services:
   archvr-mssql:
     image: mcr.microsoft.com/mssql/server:2019-latest
+    # mssql has no arm64 image, so run it emulated on Apple Silicon
+    platform: linux/amd64
     container_name: arch-mssql
-    ports: 
+    ports:
       - "1433:1433"
     environment:
       ACCEPT_EULA: "Y"
@@ -17,3 +19,16 @@ services:
     #   - backend
     volumes:
         - ~/sql-server:/var/opt/mssql/data
+
+  # azurite stands in for Azure Blob Storage
+  archvr-azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: arch-azurite
+    command: azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck -l /data
+    ports:
+      - "10000:10000"
+    volumes:
+      - archvr-azurite:/data
+
+volumes:
+  archvr-azurite:

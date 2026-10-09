@@ -15,6 +15,9 @@
     "prisma:generate": "prisma generate",
     "prisma:deploy": "prisma migrate deploy && prisma generate && prisma db seed"
   },
+  "prisma": {
+    "seed": "node prisma/seed.mjs"
+  },
   "devDependencies": {
     "@nuxt/devtools": "latest",
     "@nuxtjs/eslint-config-typescript": "^12.1.0",

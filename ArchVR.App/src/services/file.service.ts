@@ -43,7 +43,7 @@ class FileService {
               id,
               original: filepath,
               ...(ext === "glb" && { processed: filepath }),
-              name: file.name as string,
+              name: file.filename as string,
               type: getType(filepath),
             },
           });

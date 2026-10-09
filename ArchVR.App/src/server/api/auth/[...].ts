@@ -27,6 +27,8 @@ export default NuxtAuthHandler({
       // https://github.com/settings/developers
       clientId: envConfig.AUTH_GITHUB_CLIENT_ID,
       clientSecret: envConfig.AUTH_GITHUB_CLIENT_SECRET,
+      // GitHub now returns an `iss` param on the callback, which next-auth 4.21 rejects unless the issuer is set
+      issuer: "https://github.com/login/oauth",
     }),
 
     // // @ts-expect-error You need to use .default here for it to work during SSR. May be fixed via Vite at some point
