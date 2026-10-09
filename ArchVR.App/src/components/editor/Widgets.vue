@@ -8,6 +8,9 @@ import {
   EditorWidgetsKpi,
   EditorWidgetsLine,
   EditorWidgetsBlank,
+  EditorWidgetsStats,
+  EditorWidgetsMultiLine,
+  EditorWidgetsHistogram,
 } from "#components";
 
 let editor = inject(EditorKey);
@@ -32,6 +35,9 @@ const getComponent = (
   const componentMap = {
     line: EditorWidgetsLine,
     kpi: EditorWidgetsKpi,
+    stats: EditorWidgetsStats,
+    multiline: EditorWidgetsMultiLine,
+    histogram: EditorWidgetsHistogram,
   };
   if (!kind) {
     return EditorWidgetsBlank;

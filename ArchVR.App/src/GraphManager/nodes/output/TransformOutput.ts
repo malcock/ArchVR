@@ -1,7 +1,7 @@
 import { ClassicPreset } from "rete";
 import type { DataflowNode } from "rete-engine";
 import sockets from "../../sockets";
-import { type DiContainer } from "../..";
+import { type GraphContext } from "../..";
 import { Vector } from "../../types/Vector";
 
 type Data = {
@@ -15,7 +15,6 @@ export class TransformOutput
   height = 205;
 
   static ID = "Transform Output";
-  update: (control: ClassicPreset.InputControl<"number", number>) => void;
   transformId: string;
   updateTransform: (
     transformId: string,
@@ -26,10 +25,9 @@ export class TransformOutput
     }
   ) => void;
 
-  constructor(di: DiContainer, data: Data) {
+  constructor(public di: GraphContext, data: Data) {
     super("Transform Output");
     console.log("transform node created", data);
-    this.update = di.updateControl;
     this.updateTransform = di.updateTransform;
     const position = new ClassicPreset.Input(sockets.VectorOnly, "Position");
     const rotation = new ClassicPreset.Input(sockets.VectorOnly, "Rotation");
@@ -70,15 +68,10 @@ export class TransformOutput
         ...(rotation && { rotation }),
         ...(scaling && { scaling }),
       });
-    // to be removed...?
-    if (value && value[0]) {
-      var val = JSON.stringify(value[0]);
-      // console.log(this.controls);
-      (this.controls?.value as ClassicPreset.InputControl<"text">).setValue(
-        val
-      );
+    // show the live value on this node in the graph editor
+    if (value && value[0] !== undefined) {
+      this.di.showReadout?.(this.id, value[0]);
     }
-    if (this.update) this.update(this.controls.value);
 
     return { value };
   }

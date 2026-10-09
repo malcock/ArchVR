@@ -241,9 +241,5 @@ export default defineComponent({
 }
 .gnode-control {
   padding: 4px 12px;
-
-  &:has(> [hidden]) {
-    display: none;
-  }
 }
 </style>

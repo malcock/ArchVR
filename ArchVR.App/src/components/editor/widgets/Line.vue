@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { use } from "echarts/core";
 import { LineChart } from "echarts/charts";
-import { GridComponent } from "echarts/components";
+import { GridComponent, TooltipComponent } from "echarts/components";
 import { CanvasRenderer } from "echarts/renderers";
 
 import VChart, { THEME_KEY } from "vue-echarts";
-use([GridComponent, LineChart, CanvasRenderer]);
+use([GridComponent, TooltipComponent, LineChart, CanvasRenderer]);
 provide(THEME_KEY, "dark");
 
 const chart = ref<InstanceType<typeof VChart>>();
@@ -50,15 +50,25 @@ const gotData = (d: any) => {
     });
 };
 
-// canvas can't read CSS variables; these mirror theme.css
-const SIGNAL = "#5cc8f2";
-const INK_DIM = "#8a93a1";
-const HAIRLINE = "rgba(255, 255, 255, 0.08)";
+import {
+  SIGNAL,
+  INK_DIM,
+  HAIRLINE,
+  FONT,
+  tooltip,
+  formatValue,
+} from "~/config/chartTheme";
 
 const options = ref<EChartsOption>({
   backgroundColor: "transparent",
   animation: false,
-  textStyle: { fontFamily: '"IBM Plex Sans", system-ui, sans-serif' },
+  textStyle: { fontFamily: FONT },
+  tooltip: {
+    ...tooltip,
+    trigger: "axis",
+    axisPointer: { lineStyle: { color: HAIRLINE } },
+    valueFormatter: (v) => (typeof v === "number" ? formatValue(v) : "–"),
+  },
   xAxis: {
     type: "time",
     splitNumber: 3,

@@ -28,7 +28,13 @@ const { x, y, style } = useDraggable(el, {
   },
   axis: "both",
   onMove: () => emit("onStart"),
-  onEnd: () => emit("onEnd"),
+  onEnd: () => {
+    emit("onEnd");
+    trpc().scene.moveWidget.mutate({
+      widgetId: props.widget.id,
+      position: { x: x.value, y: y.value, w: pos.w, h: pos.h },
+    });
+  },
 });
 
 const fullStyle = computed(

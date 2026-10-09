@@ -62,7 +62,7 @@ export type GraphContext = {
   updateTransform: UpdateTransformFunc;
   updateWidget: UpdateWidgetFunc;
   addDeviceHook: (hook: (obj: { deviceId: string; data: any }) => void) => void;
-  updateControl?: (control: ClassicPreset.InputControl<"number">) => void;
+  showReadout?: (nodeId: string, value: unknown) => void;
   updateNode?: (n: Node) => void;
 };
 
@@ -233,8 +233,13 @@ export class GraphManager {
     area.area.content.add(grid);
     // add missing updaters to ctx
     this.ctx.updateNode = (node: Node) => area.update("node", node.id);
-    this.ctx.updateControl = (c: ClassicPreset.InputControl<"number">) => {
-      area.update("control", c.id);
+    // Graphs run in `editor`; the canvas shows a copy of the active one in
+    // `activeEditor`. Mirror a running node's value onto its copy by node id.
+    this.ctx.showReadout = (nodeId, value) => {
+      const control = this.activeEditor.getNode(nodeId)?.controls.value;
+      if (!(control instanceof ClassicPreset.InputControl)) return;
+      control.setValue(JSON.stringify(value));
+      area.update("control", control.id);
     };
 
     return {

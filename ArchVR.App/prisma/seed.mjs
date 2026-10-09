@@ -5,6 +5,9 @@ const prisma = new PrismaClient();
 const widgetTypes = [
   { name: "Line", component: "line" },
   { name: "KPI", component: "kpi" },
+  { name: "Statistics", component: "stats" },
+  { name: "Vector chart", component: "multiline" },
+  { name: "Histogram", component: "histogram" },
 ];
 
 // topics must match the ones in src/components/editor/deviceFaker.ts
@@ -14,6 +17,14 @@ const devices = [
   { topic: "UK.SHF.BLD.Cell1.MA1.heat", name: "Heat", deviceType: "temperature", unit: "°C", unitType: "number" },
   { topic: "UK.SHF.BLD.Cell1.MA1.power", name: "Power", deviceType: "power", unit: "W", unitType: "number" },
   { topic: "UK.SHF.BLD.Cell1.MA1.vector", name: "Vector", deviceType: "vector", unit: "", unitType: "vector3" },
+  { topic: "UK.SHF.BLD.humidity", name: "Humidity", deviceType: "humidity", unit: "%", unitType: "number" },
+  { topic: "UK.SHF.BLD.Cell1.MA1.rpm", name: "Spindle speed", deviceType: "speed", unit: "rpm", unitType: "number" },
+  { topic: "UK.SHF.BLD.Cell1.MA1.torque", name: "Torque", deviceType: "torque", unit: "Nm", unitType: "number" },
+  { topic: "UK.SHF.BLD.Cell1.MA1.feed", name: "Feed rate", deviceType: "speed", unit: "mm/min", unitType: "number" },
+  { topic: "UK.SHF.BLD.Cell1.MA1.coolant", name: "Coolant flow", deviceType: "flow", unit: "L/min", unitType: "number" },
+  { topic: "UK.SHF.BLD.Cell1.MA1.vibration", name: "Vibration", deviceType: "acceleration", unit: "g", unitType: "vector3" },
+  { topic: "UK.SHF.BLD.Cell1.MA2.power", name: "Power", deviceType: "power", unit: "W", unitType: "number" },
+  { topic: "UK.SHF.BLD.Cell1.MA2.heat", name: "Heat", deviceType: "temperature", unit: "°C", unitType: "number" },
 ];
 
 for (const wt of widgetTypes) {

@@ -30,8 +30,8 @@ export default defineComponent({
 </script>
 
 <template>
-  <output v-if="data.readonly" class="gctl-readout" :hidden="!readout()">
-    {{ readout() }}
+  <output v-if="data.readonly" class="gctl-readout" :class="{ 'is-idle': !readout() }">
+    {{ readout() || "No data yet" }}
   </output>
   <input
     v-else
@@ -77,5 +77,10 @@ export default defineComponent({
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  &.is-idle {
+    color: var(--ink-dim);
+    font-family: inherit;
+  }
 }
 </style>

@@ -41,13 +41,16 @@ const display = computed(() => {
   >
     <p class="widget-kpi" :class="{ 'is-idle': display === null }">
       {{ display ?? "No data yet" }}
+      <span v-if="display !== null && data?.unit" class="widget-unit">{{
+        data.unit
+      }}</span>
     </p>
   </CoreWidget>
 </template>
 
 <style>
 .widget-kpi {
-  @apply absolute inset-0 flex items-center px-3 font-semibold truncate;
+  @apply absolute inset-0 flex items-baseline content-center flex-wrap gap-x-1.5 px-3 font-semibold;
   color: var(--ink-strong);
   font-size: 2.25rem;
   line-height: 1;
@@ -59,5 +62,10 @@ const display = computed(() => {
     color: var(--ink-dim);
     font-size: 0.75rem;
   }
+}
+.widget-unit {
+  @apply font-normal tracking-normal;
+  color: var(--ink-dim);
+  font-size: 0.8125rem;
 }
 </style>

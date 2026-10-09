@@ -12,14 +12,12 @@ export class WidgetOutput extends ClassicPreset.Node implements DataflowNode {
   height = 205;
 
   static ID = "Widget Output";
-  update: (control: ClassicPreset.InputControl<"number", number>) => void;
   widgetId: string;
   updateWidget: (widgetId: string, data: any) => void;
 
-  constructor(di: GraphContext, data: Data) {
+  constructor(public di: GraphContext, data: Data) {
     super("Widget Output");
     console.log("Widget Output node created", data);
-    this.update = di.updateControl;
     this.updateWidget = di.updateWidget;
     const dataInput = new ClassicPreset.Input(sockets.Number, "Data");
 
@@ -32,6 +30,7 @@ export class WidgetOutput extends ClassicPreset.Node implements DataflowNode {
     );
 
     this.addInput("data", dataInput);
+    this.addInput("unit", new ClassicPreset.Input(sockets.Text, "Unit"));
   }
 
   data(inputs: any) {
@@ -60,18 +59,13 @@ export class WidgetOutput extends ClassicPreset.Node implements DataflowNode {
     if (this.updateWidget) {
       this.updateWidget(this.widgetId, {
         data: inputs["data"] && inputs["data"][0] ? inputs["data"][0] : [],
+        unit: inputs["unit"] ? inputs["unit"][0] : undefined,
       });
     }
-    // to be removed...?
-    if (value && value[0]) {
-      var val = JSON.stringify(value[0]);
-
-      // console.log(this.controls);
-      (this.controls?.value as ClassicPreset.InputControl<"text">).setValue(
-        val
-      );
+    // show the live value on this node in the graph editor
+    if (value && value[0] !== undefined) {
+      this.di.showReadout?.(this.id, value[0]);
     }
-    if (this.update) this.update(this.controls.value);
 
     return { value };
   }

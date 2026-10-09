@@ -192,12 +192,18 @@ class SceneService {
     });
   }
 
-  addWidget(sceneId: string, widgetTypeId?: string, name?: string) {
+  addWidget(
+    sceneId: string,
+    widgetTypeId?: string,
+    name?: string,
+    position?: string
+  ) {
     return prisma.sceneWidgets.create({
       data: {
         sceneId,
         name,
         widgetTypeId,
+        position,
       },
       select: {
         id: true,

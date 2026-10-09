@@ -9,6 +9,13 @@ import { string, z } from "zod";
 import sceneService from "~/services/scene.service";
 import { searchOptionsSchema } from "~/schemas/apiOptions";
 
+const widgetPositionSchema = z.object({
+  x: z.number(),
+  y: z.number(),
+  w: z.number(),
+  h: z.number(),
+});
+
 export const sceneRouter = router({
   get: protectedProcedure
     .input(z.object({ sceneId: z.string() }))
@@ -59,10 +66,23 @@ export const sceneRouter = router({
         sceneId: z.string(),
         widgetTypeId: z.string().optional(),
         name: z.string().optional(),
+        position: widgetPositionSchema.optional(),
       })
     )
-    .query(({ input: { sceneId, widgetTypeId, name } }) => {
-      return sceneService.addWidget(sceneId, widgetTypeId, name);
+    .query(({ input: { sceneId, widgetTypeId, name, position } }) => {
+      return sceneService.addWidget(
+        sceneId,
+        widgetTypeId,
+        name,
+        position && JSON.stringify(position)
+      );
+    }),
+  moveWidget: protectedProcedure
+    .input(z.object({ widgetId: z.string(), position: widgetPositionSchema }))
+    .mutation(async ({ input: { widgetId, position } }) => {
+      await sceneService.setWidget(widgetId, {
+        position: JSON.stringify(position),
+      });
     }),
   list: protectedProcedure
     .input(

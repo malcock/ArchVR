@@ -2,6 +2,16 @@ import type { Pausable } from "@vueuse/core";
 import type { GraphManager } from "~/GraphManager";
 import type { DeviceType } from "~/server/trpc/routers/devices";
 
+const noise = (amount: number) => (Math.random() - 0.5) * 2 * amount;
+// a machining cycle: ramp up, cut, ramp down, idle. 0 at rest, 1 at full load
+const cycle = (periodMs: number) => {
+  const t = (Date.now() % periodMs) / periodMs;
+  if (t < 0.1) return t / 0.1;
+  if (t < 0.7) return 1;
+  if (t < 0.8) return (0.8 - t) / 0.1;
+  return 0;
+};
+
 const deviceOptions = {
   "UK.SHF.BLD.ambient": {
     interval: 2000,
@@ -22,6 +32,46 @@ const deviceOptions = {
   "UK.SHF.BLD.Cell1.MA1.vector": {
     interval: 500,
     data: () => ({ x: Math.random(), y: Math.random(), z: Math.random() }),
+  },
+  "UK.SHF.BLD.humidity": {
+    interval: 2000,
+    data: () => 45 + Math.sin(Date.now() / 6e4) * 6 + noise(0.5),
+  },
+  "UK.SHF.BLD.Cell1.MA1.rpm": {
+    interval: 250,
+    data: () => cycle(30000) * 8000 + noise(40),
+  },
+  "UK.SHF.BLD.Cell1.MA1.torque": {
+    interval: 250,
+    data: () => cycle(30000) * 42 + Math.abs(noise(4)),
+  },
+  "UK.SHF.BLD.Cell1.MA1.feed": {
+    interval: 500,
+    data: () => cycle(30000) * 1200 + noise(15),
+  },
+  "UK.SHF.BLD.Cell1.MA1.coolant": {
+    interval: 1000,
+    data: () => (cycle(30000) > 0 ? 18 : 2) + noise(0.6),
+  },
+  "UK.SHF.BLD.Cell1.MA1.vibration": {
+    interval: 100,
+    data: () => {
+      const load = 0.05 + cycle(30000) * 0.6;
+      const t = Date.now() / 1e3;
+      return {
+        x: Math.sin(t * 9) * load + noise(0.03),
+        y: Math.sin(t * 13 + 1) * load * 0.7 + noise(0.03),
+        z: Math.sin(t * 5 + 2) * load * 0.4 + noise(0.02),
+      };
+    },
+  },
+  "UK.SHF.BLD.Cell1.MA2.power": {
+    interval: 1000,
+    data: () => 250 + cycle(45000) * 900 + noise(30),
+  },
+  "UK.SHF.BLD.Cell1.MA2.heat": {
+    interval: 500,
+    data: () => 24 + cycle(45000) * 38 + noise(0.4),
   },
 };
 const timers: Record<string, Pausable> = {};
