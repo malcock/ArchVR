@@ -26,10 +26,15 @@ const items = computed(() =>
 </script>
 
 <template>
-  <header class="navbar bg-base-100">
+  <header class="navbar site-bar bg-base-100">
     <div class="navbar-start">
       <div class="dropdown">
-        <div tabindex="0" role="button" class="btn btn-ghost">
+        <div
+          tabindex="0"
+          role="button"
+          class="btn btn-ghost btn-sm btn-square"
+          aria-label="Menu"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             class="h-5 w-5"

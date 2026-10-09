@@ -13,7 +13,7 @@ export class DeviceInput extends ClassicPreset.Node implements DataflowNode {
   static ID = "Device Input";
   device?: DeviceType;
   val: any;
-  width = 240;
+  width = 280;
   height = 220;
   constructor(public ctx: GraphContext, data: Data) {
     super("Device Input");
@@ -22,10 +22,15 @@ export class DeviceInput extends ClassicPreset.Node implements DataflowNode {
       value: x.id,
     }));
 
-    const sel = new SelectField(data.deviceId, deviceList, (e) => {
-      data.deviceId = e;
-      this.setOutputSocket(data.deviceId);
-    });
+    const sel = new SelectField(
+      data.deviceId,
+      deviceList,
+      (e) => {
+        data.deviceId = e;
+        this.setOutputSocket(data.deviceId);
+      },
+      "Choose a device"
+    );
 
     const onDeviceDataReceived = (obj: { deviceId: string; data: any }) => {
       if (obj.deviceId === data.deviceId && this.device) {

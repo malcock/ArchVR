@@ -90,10 +90,15 @@ async function openGraph() {
 
 <template>
   <div class="editor-obj" v-if="!multipleSelected && sel">
-    <EditorCoreField class="mx-2" label="ID" type="text" v-model="sel.id" />
-    <div class="tabs">
+    <EditorCoreField
+      class="mx-2 mt-3"
+      label="ID"
+      type="text"
+      v-model="sel.id"
+    />
+    <div class="tabs tabs-bordered">
       <a
-        class="tab tab-bordered"
+        class="tab"
         :class="{ 'tab-active': currentTab === 0 }"
         @click="currentTab = 0"
         title="Object Properties"
@@ -102,16 +107,16 @@ async function openGraph() {
       >
       <a
         v-if="ifcMeta"
-        class="tab tab-bordered"
+        class="tab"
         :class="{ 'tab-active': currentTab === 1 }"
         @click="currentTab = 1"
         title="IFC"
       >
-        ifc</a
+        IFC</a
       >
       <a
         v-if="isDevice"
-        class="tab tab-bordered"
+        class="tab"
         :class="{ 'tab-active': currentTab === 2 }"
         @click="currentTab = 2"
         title="Device"
@@ -121,8 +126,13 @@ async function openGraph() {
     </div>
     <div class="tab-content" v-if="currentTab === 0">
       <IfcGroup title="Transform">
-        <button class="btn btn-ghost" @click="openGraph">
-          <Icon>account_tree</Icon>
+        <button
+          type="button"
+          class="btn btn-ghost btn-sm gap-2 font-medium"
+          @click="openGraph"
+        >
+          <Icon size="sm" aria-hidden="true">account_tree</Icon>
+          Edit node graph
         </button>
       </IfcGroup>
     </div>
@@ -155,15 +165,42 @@ async function openGraph() {
       <EditorDevicePanel :device="sel" />
     </div>
   </div>
+  <div class="editor-empty" v-else>
+    <Icon aria-hidden="true">deployed_code</Icon>
+    <template v-if="multipleSelected">
+      <p class="editor-empty-title">
+        {{ selection!.objects.length }} objects selected
+      </p>
+      <p>Select a single object to edit its properties.</p>
+    </template>
+    <template v-else>
+      <p class="editor-empty-title">Nothing selected</p>
+      <p>Click an object in the scene to see its properties.</p>
+    </template>
+  </div>
 </template>
 
 <style>
+.editor-empty {
+  @apply flex-grow flex flex-col items-center justify-center gap-1 px-6 text-center;
+  color: var(--ink-dim);
+
+  .icon {
+    @apply mb-2;
+    font-size: 28px;
+    opacity: 0.6;
+  }
+  &-title {
+    @apply text-sm font-medium;
+    color: var(--ink-strong);
+  }
+}
 .editor {
   &-obj {
     @apply flex-grow flex flex-col;
 
     .tab-content {
-      @apply overflow-y-scroll h-80 grow bg-base-300 pt-2 px-1 block;
+      @apply overflow-y-auto h-80 grow bg-base-300 pt-2 px-1 block;
     }
   }
 }

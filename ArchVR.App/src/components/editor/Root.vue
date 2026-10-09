@@ -77,7 +77,7 @@ const widgetAdded = (widget: SceneWidgetType) => {
     <EditorTools />
     <EditorAddModel :scene="sceneCopy" />
     <EditorAddWidget :scene="sceneCopy" @added="widgetAdded" />
-    <aside id="editorsidebar" class="editor-side">
+    <aside id="editorsidebar" class="editor-side panel">
       <!-- <EditorExplorer /> -->
       <EditorPropertyPanel />
     </aside>
@@ -96,6 +96,6 @@ const widgetAdded = (widget: SceneWidgetType) => {
 }
 
 .editor-side {
-  @apply absolute flex flex-col bg-base-100 top-20 w-64 bottom-20 right-2 rounded-box overflow-hidden;
+  @apply absolute flex flex-col top-16 w-72 bottom-3 right-3 rounded-box overflow-hidden;
 }
 </style>

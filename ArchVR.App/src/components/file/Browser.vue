@@ -32,9 +32,9 @@ const getThumbnail = (path: string | null = null) => {
       <button
         type="button"
         @click="selectFile(data)"
-        class="card card_file bg-base-100 border-2 border-base-200"
+        class="card card_file bg-base-200"
         :class="{
-          '!border-primary': currentFile && currentFile.id === data.id,
+          'is-selected': currentFile && currentFile.id === data.id,
         }"
       >
         <img
@@ -43,7 +43,7 @@ const getThumbnail = (path: string | null = null) => {
           :alt="data.name"
         />
         <p class="text-sm mt-2">{{ data.name }}</p>
-        <p class="text-xs text-neutral-content">
+        <p class="text-xs" style="color: var(--ink-dim)">
           Uploaded: {{ new Date(data.createdAt).toLocaleString() }}
         </p>
       </button>
@@ -54,10 +54,18 @@ const getThumbnail = (path: string | null = null) => {
 <style>
 .card {
   &_file {
-    @apply rounded-sm p-2;
+    @apply rounded-lg p-2 text-left transition-colors;
+    border: 1px solid var(--hairline);
 
+    &:hover {
+      border-color: var(--hairline-strong);
+    }
+    &.is-selected {
+      border-color: oklch(var(--p));
+      box-shadow: 0 0 0 1px oklch(var(--p));
+    }
     .thumb {
-      @apply rounded-sm;
+      @apply rounded w-full;
     }
   }
 }

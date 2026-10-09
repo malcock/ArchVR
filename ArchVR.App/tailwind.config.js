@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-import colors from 'tailwindcss/colors'
+import defaultTheme from 'tailwindcss/defaultTheme'
 import daisyui from 'daisyui'
 export default {
   content: [
@@ -12,14 +12,19 @@ export default {
       dark: {
         "color-scheme": "dark",
         "primary": "#FF9800",
+        "primary-content": "#1c1203",
         "secondary": "oklch(74.8% 0.26 342.55)",
         "accent": "oklch(74.51% 0.167 183.61)",
-        "neutral": "#2a323c",
-        "neutral-content": "#A6ADBB",
-        "base-100": "#1d232a",
-        "base-200": "#191e24",
-        "base-300": "#15191e",
-        "base-content": "#A6ADBB",
+        "neutral": "#262d36",
+        "neutral-content": "#aab2bf",
+        // base-200 is the page, base-100 a raised panel, base-300 a well
+        "base-100": "#1b2027",
+        "base-200": "#15191f",
+        "base-300": "#101318",
+        "base-content": "#b4bcc8",
+        "--rounded-box": "0.75rem",
+        "--rounded-btn": "0.5rem",
+        "--animation-btn": "0.15s",
       },
     },"light"],
   },
@@ -29,7 +34,10 @@ export default {
       padding:'1rem'
     },
     extend: {
-
+      fontFamily: {
+        sans: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],
+        mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
+      },
     },
   },
   plugins: [daisyui],

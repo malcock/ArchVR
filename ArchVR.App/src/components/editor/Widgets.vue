@@ -65,7 +65,11 @@ const showGrid = ref(false);
 .widget-backdrop {
   background-size: 40px 40px;
   background-position: 0 0;
-  background-image: radial-gradient(circle, #fff 0px, rgba(0, 0, 0, 0) 2px);
+  background-image: radial-gradient(
+    circle,
+    rgb(255 255 255 / 0.35) 1px,
+    transparent 1.5px
+  );
   width: 100vw;
   height: 100vh;
   position: fixed;

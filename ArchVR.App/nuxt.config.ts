@@ -7,7 +7,7 @@ export default defineNuxtConfig({
     "~archvr3d": fileURLToPath(new URL("../ArchVR.3D", import.meta.url)),
   },
   srcDir: "src",
-  css: ["~/assets/css/icons.css"],
+  css: ["~/assets/css/theme.css", "~/assets/css/icons.css"],
   devtools: { enabled: true },
   build: {
     transpile: ["trpc-nuxt", "echarts"],

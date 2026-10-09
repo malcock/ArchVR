@@ -1,7 +1,7 @@
 //rete imports
 import { ClassicPreset, type GetSchemes, NodeEditor } from "rete";
 import { DataflowEngine } from "rete-engine";
-import { AreaPlugin } from "rete-area-plugin";
+import { AreaExtensions, AreaPlugin } from "rete-area-plugin";
 import { type VueArea2D, VuePlugin, Presets } from "rete-vue-plugin";
 import {
   type ContextMenuExtra,
@@ -20,6 +20,11 @@ import {
 //relative imports
 import { SelectField } from "./controls/select-field";
 import SelectUI from "./controls/SelectUI.vue";
+import GraphNode from "./ui/GraphNode.vue";
+import GraphSocket from "./ui/GraphSocket.vue";
+import GraphConnection from "./ui/GraphConnection.vue";
+import GraphControl from "./ui/GraphControl.vue";
+import { setSocketLookup } from "./ui/meta";
 import * as Nodes from "./nodes";
 import type { ConnProps, Node } from "./types";
 export type Schemes = GetSchemes<Node, ConnProps>;
@@ -73,6 +78,7 @@ export class GraphManager {
     data: any;
   }>();
   arrange!: AutoArrangePlugin<Schemes, never>;
+  area!: AreaPlugin<Schemes, AreaExtra>;
 
   /**
    * Create base editor and engine, without render context
@@ -184,19 +190,25 @@ export class GraphManager {
     });
 
     render.addPreset(Presets.contextMenu.setup({ delay: 200 }));
-    render.addPreset(Presets.classic.setup());
     render.addPreset(
       Presets.classic.setup({
         customize: {
+          node: () => GraphNode,
+          socket: () => GraphSocket,
+          connection: () => GraphConnection,
           control(data) {
             if (data.payload instanceof SelectField) return SelectUI;
 
             if (data.payload instanceof ClassicPreset.InputControl) {
-              return Presets.classic.Control;
+              return GraphControl;
             }
+            return null;
           },
         },
       })
+    );
+    setSocketLookup(
+      (nodeId, key) => this.activeEditor.getNode(nodeId)?.outputs[key]?.socket
     );
     connection.addPreset(ConnectionPresets.classic.setup());
     arrange.addPreset(ArrangePresets.classic.setup());
@@ -204,10 +216,21 @@ export class GraphManager {
     //active editor is the one that you use!
     this.activeEditor.use(area);
     this.arrange = arrange;
+    this.area = area;
     area.use(contextMenu);
     area.use(connection);
     area.use(render);
     area.use(arrange);
+
+    AreaExtensions.selectableNodes(area, AreaExtensions.selector(), {
+      accumulating: AreaExtensions.accumulateOnCtrl(),
+    });
+    AreaExtensions.simpleNodesOrder(area);
+
+    // dot grid that pans and zooms with the graph
+    const grid = document.createElement("div");
+    grid.classList.add("rete-grid");
+    area.area.content.add(grid);
     // add missing updaters to ctx
     this.ctx.updateNode = (node: Node) => area.update("node", node.id);
     this.ctx.updateControl = (c: ClassicPreset.InputControl<"number">) => {
@@ -253,6 +276,50 @@ export class GraphManager {
     await importEditor(this.ctx, gIO, "activeEditor");
 
     await this.arrange.layout();
+  }
+
+  async tidy() {
+    await this.arrange.layout();
+    await this.fitView();
+  }
+
+  /** Centre the active graph in the canvas, never zooming past 100% */
+  async fitView(padding = 48) {
+    const { area } = this;
+    const nodes = this.activeEditor.getNodes();
+    if (!area || !nodes.length) return;
+    // nodes mount asynchronously; wait for them to have a size
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    let minX = Infinity;
+    let minY = Infinity;
+    let maxX = -Infinity;
+    let maxY = -Infinity;
+    for (const node of nodes) {
+      const view = area.nodeViews.get(node.id);
+      if (!view) continue;
+      const { x, y } = view.position;
+      const el = view.element.firstElementChild as HTMLElement | null;
+      minX = Math.min(minX, x);
+      minY = Math.min(minY, y);
+      maxX = Math.max(maxX, x + (el?.offsetWidth || node.width));
+      maxY = Math.max(maxY, y + (el?.offsetHeight || node.height));
+    }
+    if (!Number.isFinite(minX)) return;
+
+    const { clientWidth, clientHeight } = area.container;
+    const width = maxX - minX;
+    const height = maxY - minY;
+    const k = Math.min(
+      1,
+      (clientWidth - padding * 2) / width,
+      (clientHeight - padding * 2) / height
+    );
+    await area.area.zoom(k, 0, 0);
+    await area.area.translate(
+      (clientWidth - width * k) / 2 - minX * k,
+      (clientHeight - height * k) / 2 - minY * k
+    );
   }
 
   async saveActiveGraph() {

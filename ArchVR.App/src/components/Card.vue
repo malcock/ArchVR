@@ -18,7 +18,7 @@ const slots = useSlots();
 </script>
 
 <template>
-  <div class="card bg-base-200">
+  <div class="card panel">
     <figure v-if="image">
       <img :src="image" :alt="imageAlt" />
     </figure>

@@ -46,7 +46,7 @@ const onSubmit = async () => {
             <input
               type="radio"
               name="radio-10"
-              class="radio checked:bg-red-500"
+              class="radio radio-primary radio-sm"
               v-model="selectedWidget"
               :value="item"
             />

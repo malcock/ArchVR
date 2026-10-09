@@ -50,25 +50,63 @@ const gotData = (d: any) => {
     });
 };
 
+// canvas can't read CSS variables; these mirror theme.css
+const SIGNAL = "#5cc8f2";
+const INK_DIM = "#8a93a1";
+const HAIRLINE = "rgba(255, 255, 255, 0.08)";
+
 const options = ref<EChartsOption>({
+  backgroundColor: "transparent",
+  animation: false,
+  textStyle: { fontFamily: '"IBM Plex Sans", system-ui, sans-serif' },
   xAxis: {
     type: "time",
+    splitNumber: 3,
+    axisLine: { lineStyle: { color: HAIRLINE } },
+    axisTick: { show: false },
+    splitLine: { show: false },
+    axisLabel: {
+      color: INK_DIM,
+      fontSize: 10,
+      hideOverlap: true,
+      formatter: "{HH}:{mm}:{ss}",
+    },
   },
   yAxis: {
     type: "value",
+    splitNumber: 3,
+    axisLabel: { color: INK_DIM, fontSize: 10 },
+    splitLine: { lineStyle: { color: HAIRLINE } },
   },
   series: [
     {
       data: [],
       type: "line",
       smooth: false,
+      showSymbol: false,
+      lineStyle: { width: 1.5, color: SIGNAL },
+      itemStyle: { color: SIGNAL },
+      areaStyle: {
+        origin: "start",
+        color: {
+          type: "linear",
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: "rgba(92, 200, 242, 0.2)" },
+            { offset: 1, color: "rgba(92, 200, 242, 0)" },
+          ],
+        },
+      },
     },
   ],
   grid: {
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
+    top: 10,
+    bottom: 6,
+    left: 8,
+    right: 12,
     containLabel: true, // This ensures that labels are inside the chart area
   },
 });
@@ -81,9 +119,14 @@ const options = ref<EChartsOption>({
     @data-received="gotData"
   >
     <client-only>
-      <v-chart ref="chart" class="chart h-32" :option="options" />
+      <v-chart ref="chart" class="widget-chart" :option="options" autoresize />
     </client-only>
   </CoreWidget>
 </template>
 
-<style></style>
+<style>
+.widget-chart {
+  position: absolute;
+  inset: 0;
+}
+</style>

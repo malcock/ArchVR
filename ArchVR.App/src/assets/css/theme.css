@@ -1,0 +1,86 @@
+@import "https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap";
+
+:root {
+  --ink-strong: #e8ebf0;
+  --ink-dim: #8a93a1;
+  --hairline: rgb(255 255 255 / 0.08);
+  --hairline-strong: rgb(255 255 255 / 0.14);
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.04) inset,
+    0 14px 32px -14px rgb(0 0 0 / 0.7), 0 2px 6px -2px rgb(0 0 0 / 0.4);
+
+  /* one colour per data type, from socket to wire to chart */
+  --signal-number: #5cc8f2;
+  --signal-vector: #b49cf5;
+  --signal-text: #98a2b3;
+  --signal-image: #7fd6a4;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: oklch(var(--b2));
+  font-feature-settings: "tnum", "zero";
+}
+
+h1,
+h2,
+h3,
+.card-title {
+  color: var(--ink-strong);
+  text-wrap: balance;
+}
+
+::selection {
+  background: oklch(var(--p) / 0.3);
+  color: var(--ink-strong);
+}
+
+:focus-visible {
+  outline: 2px solid oklch(var(--p));
+  outline-offset: 2px;
+}
+
+input,
+textarea {
+  caret-color: oklch(var(--p));
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.16) transparent;
+}
+
+.btn {
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}
+
+/* floating editor surfaces: tool rail, side panel, widgets, menus */
+.panel {
+  background-color: oklch(var(--b1));
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-panel);
+}
+
+.modal-box,
+.dropdown-content {
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-panel);
+}
+
+.modal::backdrop,
+.modal:not(dialog:not(.modal-open)) {
+  background-color: rgb(8 10 13 / 0.6);
+}
+
+.site-bar {
+  position: relative;
+  z-index: 10;
+  height: 3rem;
+  min-height: 3rem;
+  padding: 0 0.5rem;
+  border-bottom: 1px solid var(--hairline);
+}

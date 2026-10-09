@@ -11,8 +11,8 @@ const initial = computed(() =>
 <template>
   <div class="auth ml-16">
     <template v-if="isAuthenticated">
-      <div class="dropdown">
-        <div tabindex="0" role="button" class="btn btn-ghost">
+      <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-sm h-10 gap-3">
           <span class="hidden md:inline">{{
             data?.user?.name || data?.user?.email
           }}</span>
@@ -29,7 +29,7 @@ const initial = computed(() =>
         </div>
         <ul
           tabindex="0"
-          class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52"
+          class="dropdown-content z-[1] menu mt-2 p-2 bg-base-100 rounded-box w-52"
         >
           <li><NuxtLink to="/auth/profile">Profile</NuxtLink></li>
           <li><a @click="signOut()">Logout</a></li>

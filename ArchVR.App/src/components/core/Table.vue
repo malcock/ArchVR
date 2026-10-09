@@ -72,6 +72,20 @@ const cellValue = (
 .table {
   th {
     vertical-align: middle;
+    color: var(--ink-dim);
+    font-weight: 500;
+  }
+  td a {
+    @apply font-medium transition-colors;
+    color: var(--ink-strong);
+
+    &:hover {
+      color: oklch(var(--p));
+    }
+  }
+  :where(thead, tbody) :where(tr:not(:last-child)),
+  :where(thead, tbody) :where(tr:first-child:last-child) {
+    border-color: var(--hairline);
   }
 }
 </style>

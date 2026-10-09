@@ -12,8 +12,13 @@ const initialGraph = () => ({
 
 <template>
   <CoreWidget :widget="widget" :initial-graph="initialGraph">
-    Blank
+    <p class="widget-blank">Blank</p>
   </CoreWidget>
 </template>
 
-<style></style>
+<style>
+.widget-blank {
+  @apply absolute inset-0 grid place-items-center text-xs;
+  color: var(--ink-dim);
+}
+</style>
