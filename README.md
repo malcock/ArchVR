@@ -2,7 +2,7 @@
 
 A browser-based digital twin editor. Upload 3D models, arrange them into scenes, and bind live device data to objects and dashboard widgets through a visual node graph. No code required to wire a sensor to a moving part or a chart.
 
-![A machining cell in the 3D editor, with live widgets for spindle speed, coolant flow, vibration and torque](docs/screenshots/scene-widgets.jpg)
+![A machining cell in the 3D editor, with live widgets for spindle speed, coolant flow, vibration and torque](docs/screenshots/scene-overview.jpg)
 
 ArchVR is a working title. The project is a prototype: device data is currently simulated in the browser, and there's no connection to a real message broker yet.
 
