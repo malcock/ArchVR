@@ -41,7 +41,7 @@ const gotData = (d: any) => {
     value: [now.toISOString(), d.data],
   };
   dataHistory.value.push(newD);
-  if (dataHistory.value.length > 99) dataHistory.value.shift();
+  if (dataHistory.value.length > 399) dataHistory.value.shift();
   if (chart.value)
     chart.value.setOption({
       series: {

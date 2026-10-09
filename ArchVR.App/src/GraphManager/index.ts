@@ -163,6 +163,15 @@ export class GraphManager {
           ],
         ],
         [
+          "Math",
+          [
+            [
+              "Scale Offset",
+              () => new Nodes.ScaleOffset(this.ctx, { scale: 1, offset: 0 }),
+            ],
+          ],
+        ],
+        [
           "Output",
           [
             [

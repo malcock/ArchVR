@@ -12,6 +12,7 @@ export async function createNode(ctx: GraphContext, name: string, data: any) {
     [Nodes.TransformOutput.ID]: () => new Nodes.TransformOutput(ctx, data),
     [Nodes.WidgetOutput.ID]: () => new Nodes.WidgetOutput(ctx, data),
     [Nodes.VectorCombiner.ID]: () => new Nodes.VectorCombiner(ctx, data),
+    [Nodes.ScaleOffset.ID]: () => new Nodes.ScaleOffset(ctx, data),
   };
   const matched = nodes[name];
 
