@@ -2,6 +2,8 @@
 
 A browser-based digital twin editor. Upload 3D models, arrange them into scenes, and bind live device data to objects and dashboard widgets through a visual node graph. No code required to wire a sensor to a moving part or a chart.
 
+![A machining cell in the 3D editor, with live widgets for spindle speed, coolant flow, vibration and torque](docs/screenshots/scene-widgets.jpg)
+
 ArchVR is a working title. The project is a prototype: device data is currently simulated in the browser, and there's no connection to a real message broker yet.
 
 ## What it does
@@ -10,7 +12,17 @@ ArchVR is a working title. The project is a prototype: device data is currently 
 - **3D editor.** Place and transform GLB models in the browser. IFC property sets are shown for objects that carry them.
 - **Devices.** Each device is identified by a hierarchical topic, for example `UK.SHF.BLD.Cell1.MA1.spindle`.
 - **Node graphs.** Wire a device's output through maths and vector nodes into an object's transform or a widget. Ports and wires are coloured by data type.
-- **Widgets.** KPI and line chart widgets sit over the scene and update as data arrives.
+- **Widgets.** KPI, statistics, line chart, vector chart and histogram widgets sit over the scene and update as data arrives.
+
+### The node graph
+
+Each widget and each object transform has its own graph. Here a coolant flow reading passes through a scale and offset before it reaches a KPI widget, with the device's unit wired alongside it.
+
+![A node graph wiring a coolant flow device through a Scale Offset node into a widget output](docs/screenshots/node-graph.jpg)
+
+Right-click the canvas to add a node. Wires take the colour of the data they carry, so the vector from a vibration sensor reads differently from a plain number.
+
+![The add-node menu open over a graph that wires a vibration sensor into a widget](docs/screenshots/node-graph-add-node.jpg)
 
 ## Repository layout
 
